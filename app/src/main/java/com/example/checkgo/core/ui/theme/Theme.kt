@@ -11,16 +11,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = LightColorPrimary,
+    secondary = LightColorSecondary,
+    tertiary = LightColorWhite,
+    background = DarkColorBackground
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
+    primary = LightColorPrimary,
+    secondary = LightColorSecondary,
+    tertiary = LightColorWhite,
+    background = LightColorBackground
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
     surface = Color(0xFFFFFBFE),
@@ -50,7 +51,7 @@ fun CheckgoTheme(
     }
 
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = LightColorScheme, //cambiar a colorScheme para que detecte si el celular esta en modo oscuro o no
         typography = Typography,
         content = content
     )
