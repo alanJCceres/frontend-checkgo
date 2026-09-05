@@ -5,7 +5,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -14,36 +18,66 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.*
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 
 @Composable
 fun CustomTextField(
     value: String,
     onValueChange: (String) -> Unit,
+    onBlur: () -> Unit = {},
     label: String,
     modifier: Modifier = Modifier,
     placeholder: String = "",
     leadingIcon: ImageVector? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-    errorMessage: String? = null
+    errorMessage: String? = null,
+    isPassword: Boolean = false,
+    isPasswordVisible: Boolean = false,
+    onPasswordToggleClick: () -> Unit = {}
 ) {
+    var hasHadFocus by remember { mutableStateOf(false) }
     Column(modifier = modifier.fillMaxWidth()) {
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = modifier.fillMaxWidth(),
+            modifier = modifier
+                .fillMaxWidth()
+                .onFocusChanged { focusState ->
+                if (focusState.isFocused) hasHadFocus = true
+                else if (!focusState.isFocused && hasHadFocus) onBlur()
+            },
+            visualTransformation = if(isPassword && !isPasswordVisible){
+                PasswordVisualTransformation()
+            }else{
+                VisualTransformation.None
+            },
+            trailingIcon = {
+                when {
+                    isPassword -> {
+                        IconButton(onClick = onPasswordToggleClick) {
+                            val icon = if (isPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility
+                            val description = if (isPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+                            Icon(imageVector = icon, contentDescription = description)
+                        }
+                    }
+                    trailingIcon != null -> {
+                        trailingIcon()
+                    }
+                    else -> null
+                }
+            },
             label = { Text(text = label) },
             placeholder = { Text(text = placeholder) },
-            leadingIcon = leadingIcon?.let {
-                { Icon(imageVector = it, contentDescription = null) }
-            },
-            trailingIcon = trailingIcon,
+            leadingIcon = leadingIcon?.let { { Icon(imageVector = it, contentDescription = null) } },
             isError = isError,
-            visualTransformation = visualTransformation,
             keyboardOptions = keyboardOptions,
             singleLine = true,
             shape = RoundedCornerShape(14.dp), // Bordes más redondeados y suaves
