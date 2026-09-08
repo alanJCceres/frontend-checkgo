@@ -34,6 +34,7 @@ fun RegisterScreen(
     viewModel: RegisterViewModel= viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val postResult by viewModel.postResult.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -117,9 +118,13 @@ fun RegisterScreen(
                     .fillMaxWidth()
                     .height(50.dp),
                 shape = RoundedCornerShape(20.dp),
-                onClick = { }
+                onClick = {viewModel.onRegisterClicked() }
             ) {
                 Text("Registrarse")
+            }
+            postResult?.let {
+                Spacer(modifier=Modifier.height(8.dp))
+                Text(it,color=if(it.contains("Error")) Color.Red else Color.Green)
             }
             Spacer(modifier = Modifier.height(16.dp))
             //PIE DE PAGINA Sing in

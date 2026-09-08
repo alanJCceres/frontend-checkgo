@@ -2,6 +2,10 @@ package com.example.checkgo.feature_auth.presentation.viewmodel
 
 import android.R
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.checkgo.core.data.enum.UserRole
+import com.example.checkgo.feature_auth.data.dto.RegisterUserRequestDto
+import com.example.checkgo.feature_auth.domain.usecase.RegisterUserUseCase
 import com.example.checkgo.feature_auth.domain.validators.EmailValidator
 import com.example.checkgo.feature_auth.domain.validators.FullNameValidator
 import com.example.checkgo.feature_auth.domain.validators.PasswordValidator
@@ -12,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 data class RegisterUiState(
     val fullname: String="",
@@ -30,6 +35,20 @@ data class RegisterUiState(
 )
 
 class RegisterViewModel: ViewModel() {
+    private val registerUserUseCase = RegisterUserUseCase()
+    // -- ESTADO GET (Reactivo) --
+//    private val _currentUserId = MutableStateFlow("1")
+//    val userQueryState: StateFlow<StoreReadResponse<User>> = _currentUserId
+//        .flatMapLatest { id -> getUserUseCase(id) }
+//        .stateIn(
+//            scope = viewModelScope,
+//            started = SharingStarted.WhileSubscribed(5000),
+//            initialValue = StoreReadResponse.Loading(origin = StoreReadResponse.Origin.Fetcher)
+//        )
+
+    // -- ESTADO POST (Imperativo) --
+    private val _postResult = MutableStateFlow<String?>(null)
+    val postResult: StateFlow<String?> = _postResult.asStateFlow()
     private val _uiState = MutableStateFlow(RegisterUiState())
     val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
     private val _navigationEvent = Channel<String>()
@@ -109,6 +128,25 @@ class RegisterViewModel: ViewModel() {
         _uiState.update { it.copy(
             errorPassword = validationError
         ) }
+    }
+    fun onRegisterClicked() {
+        val currentState = _uiState.value
+
+        val userToSave = RegisterUserRequestDto(
+                fullname = currentState.fullname,
+                email=currentState.email,
+                userName = currentState.userName,
+                password = currentState.password,
+                rol = UserRole.SUPER_ADMIN,
+                planPublicId = "a633b916-149e-4a0a-a527-799e4b7ba78f"
+        )
+        _postResult.value="Cargando..."
+        viewModelScope.launch {
+            registerUserUseCase(userToSave).fold(
+                onSuccess = {_postResult.value = "Exito"},
+                onFailure = {_postResult.value = "Error"}
+            )
+        }
     }
 
     fun togglePasswordVisibility(){
