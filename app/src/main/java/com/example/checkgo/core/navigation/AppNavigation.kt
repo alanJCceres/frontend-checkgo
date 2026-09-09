@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.checkgo.feature_auth.presentation.screens.RegisterAdminSuccScreen
 import com.example.checkgo.feature_auth.presentation.screens.RegisterScreen
 
 @Composable
@@ -14,8 +15,8 @@ fun AppNavigation() {
         composable("inicio"){
             RegisterScreen(navController=navController)
         }
-        composable("home") {
-            //Home()
+        composable("registerAdminSuccScreen") {
+            RegisterAdminSuccScreen(navController=navController)
         }
     }
 }

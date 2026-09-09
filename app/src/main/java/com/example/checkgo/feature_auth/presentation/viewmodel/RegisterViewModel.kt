@@ -32,10 +32,20 @@ data class RegisterUiState(
     val errorUserName: String? = null,
     val errorPassword: String? = null,
     val errorConfirmPassword: String? = null,
+    val isLoading: Boolean=false,
 )
-
+sealed class RegisterUiEvent{
+    data class Navigate(val route: String): RegisterUiEvent()
+    data class ShowToast(val message: String): RegisterUiEvent()
+}
 class RegisterViewModel: ViewModel() {
     private val registerUserUseCase = RegisterUserUseCase()
+    private val _postResult = MutableStateFlow<String?>(null)
+    val postResult: StateFlow<String?> = _postResult.asStateFlow()
+    private val _uiState = MutableStateFlow(RegisterUiState())
+    val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
+    private val _navigationEvent = Channel<RegisterUiEvent>()
+    val navigationEvent = _navigationEvent.receiveAsFlow()
     // -- ESTADO GET (Reactivo) --
 //    private val _currentUserId = MutableStateFlow("1")
 //    val userQueryState: StateFlow<StoreReadResponse<User>> = _currentUserId
@@ -46,13 +56,7 @@ class RegisterViewModel: ViewModel() {
 //            initialValue = StoreReadResponse.Loading(origin = StoreReadResponse.Origin.Fetcher)
 //        )
 
-    // -- ESTADO POST (Imperativo) --
-    private val _postResult = MutableStateFlow<String?>(null)
-    val postResult: StateFlow<String?> = _postResult.asStateFlow()
-    private val _uiState = MutableStateFlow(RegisterUiState())
-    val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
-    private val _navigationEvent = Channel<String>()
-    val navigationEvent = _navigationEvent.receiveAsFlow()
+
 
     fun onFullnameChange(newFullname:String){
         _uiState.update { estadoActual ->
@@ -131,22 +135,44 @@ class RegisterViewModel: ViewModel() {
     }
     fun onRegisterClicked() {
         val currentState = _uiState.value
-
-        val userToSave = RegisterUserRequestDto(
+        if(!inputsInvalidos()){
+            _uiState.update { it.copy(isLoading = true) }
+            val userToSave = RegisterUserRequestDto(
                 fullname = currentState.fullname,
                 email=currentState.email,
                 userName = currentState.userName,
                 password = currentState.password,
                 rol = UserRole.SUPER_ADMIN,
                 planPublicId = "a633b916-149e-4a0a-a527-799e4b7ba78f"
-        )
-        _postResult.value="Cargando..."
-        viewModelScope.launch {
-            registerUserUseCase(userToSave).fold(
-                onSuccess = {_postResult.value = "Exito"},
-                onFailure = {_postResult.value = "Error"}
             )
+            viewModelScope.launch {
+                registerUserUseCase(userToSave).fold(
+                    onSuccess = {
+                        _uiState.update { it.copy(isLoading = false) }
+                        _navigationEvent.send(RegisterUiEvent.Navigate("registerAdminSuccScreen"))
+                    },
+                    onFailure = {exception ->
+                        _uiState.update { it.copy(isLoading = false) }
+                        val errorMessage = exception.message?:"Error desconocido"
+                        _navigationEvent.send(RegisterUiEvent.ShowToast(errorMessage))
+                    }
+                )
+            }
         }
+
+    }
+    fun inputsInvalidos(): Boolean{
+        var res: Boolean=false
+        val currentState = _uiState.value
+        val fullnameError = FullNameValidator.validate(currentState.fullname)
+        val userNameError = UserNameValidator.validate(currentState.userName)
+        val passwordError = PasswordValidator.validate(currentState.password)
+        val emailError = EmailValidator.validate(currentState.email)
+        if(fullnameError!=null || userNameError!=null ||
+            passwordError!=null || emailError!=null || currentState.errorConfirmPassword!=null){
+            res=true
+        }
+        return res
     }
 
     fun togglePasswordVisibility(){

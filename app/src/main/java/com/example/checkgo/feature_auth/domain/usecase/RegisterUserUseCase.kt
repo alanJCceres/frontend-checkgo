@@ -1,5 +1,6 @@
 package com.example.checkgo.feature_auth.domain.usecase
 
+import com.example.checkgo.core.data.dto.ErrorResponseDto
 import com.example.checkgo.feature_auth.data.dto.RegisterUserRequestDto
 import com.example.checkgo.feature_auth.data.repository.AuthRepository
 import io.ktor.client.call.body
@@ -11,14 +12,17 @@ class RegisterUserUseCase {
             val response = repository.postRegisterUser(request)
             return when(response.status.value){
                 201,200->{
-                    //val body = response.body<RegisterUserRequestDto>()
                     Result.success("usuario creado")
                 }
-                400 -> Result.failure(Exception("datos invalidos"))
-                else -> Result.failure(Exception("Error inesperado"))
+                400 -> Result.failure(Exception("datos inválidos, por favor cierre la app y vuelva a ingresar"))
+                409 -> {
+                    val errorBody = response.body<ErrorResponseDto>()
+                    Result.failure(Exception(errorBody.message))
+                }
+                else -> Result.failure(Exception("500: Error inesperado del servidor"))
             }
         }catch(e: Exception){
-            return Result.failure(Exception("fallo de red: ${e.message}"))
+            return Result.failure(Exception("fallo de red o de proceso: ${e.message}"))
         }
     }
 }
