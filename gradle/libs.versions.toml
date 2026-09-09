@@ -8,6 +8,12 @@ lifecycleRuntimeKtx = "2.11.0"
 activityCompose = "1.13.0"
 kotlin = "2.2.10"
 composeBom = "2026.02.01"
+navigationCompose = "2.7.7" #para navigation
+lifecycleViewmodelCompose = "2.8.0" #para viewmodel
+uiUnit = "1.11.2" #para usar dp o DP
+ktor = "2.3.11" #para conexion http backend
+kotlinx-serialization = "1.6.3" #para serializacion json
+store5 = "5.0.0" #para cache de peticiones tipo tanstack query
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -25,7 +31,37 @@ androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 
+#para iconos
+androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
+# para navegacion
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+#para usar dp o DP usualmente viene defecto, no incluir si no viene defecto
+androidx-compose-ui-unit = { group = "androidx.compose.ui", name = "ui-unit", version.ref = "uiUnit" }
+#para view model
+androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
+# Ktor Client http
+ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version.ref = "ktor" }
+ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
+# Kotlinx Serialization json
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+# Store5 tipo tanstack query
+store5 = { group = "org.mobilenativefoundation.store", name = "store5", version.ref = "store5" }
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" } # Kotlinx Serialization json
+
+[bundles]
+# Agrupamos Ktor para no llamar a cada uno por separado en el gradle
+ktor-client = [
+    "ktor-client-core",
+    "ktor-client-android",
+    "ktor-client-content-negotiation",
+    "ktor-serialization-kotlinx-json",
+    "ktor-client-logging"
+]
 
