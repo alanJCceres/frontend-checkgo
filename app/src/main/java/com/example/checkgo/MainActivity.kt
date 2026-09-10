@@ -10,6 +10,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.graphics.toColorInt
 import com.example.checkgo.core.navigation.AppNavigation
@@ -20,7 +22,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(
             statusBarStyle = androidx.activity.SystemBarStyle.dark(
-                "blue".toColorInt() //pinta la barra de iconos
+                Color(0xFF4682B4).toArgb()
             )
         )
         setContent {

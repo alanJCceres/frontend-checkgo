@@ -2,33 +2,37 @@ package com.example.checkgo.core.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-
-// Set of Material typography styles to start with
-val Typography = Typography(
-    bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
-    )
-    /* Other default text styles to override
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 22.sp,
-        lineHeight = 28.sp,
-        letterSpacing = 0.sp
-    ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        lineHeight = 16.sp,
-        letterSpacing = 0.5.sp
-    )
-    */
+import com.example.checkgo.R
+val GoogleSansFlex = FontFamily(
+Font(R.font.sans_flex_24pt_black, FontWeight.Black),
+        Font(R.font.sans_flex_24pt_bold, FontWeight.Bold),
+        Font(R.font.sans_flex_24pt_light, FontWeight.Light),
+        Font(R.font.sans_flex_24pt_thin, FontWeight.Thin),
+        Font(R.font.sansflex_24pt_extrabold, FontWeight.ExtraBold),
+        Font(R.font.sansflex_24pt_extralight, FontWeight.ExtraLight),
+        Font(R.font.sansflex_24pt_medium, FontWeight.Medium),
+        Font(R.font.sansflex_24pt_regular, FontWeight.Normal),
+        Font(R.font.sansflex_24pt_semibold, FontWeight.SemiBold),
+)
+private val defaultTypography = Typography()
+val CheckGoTypography = Typography(
+    displayLarge = defaultTypography.displayLarge.copy(fontFamily = GoogleSansFlex),
+    displayMedium = defaultTypography.displayMedium.copy(fontFamily = GoogleSansFlex),
+    displaySmall = defaultTypography.displaySmall.copy(fontFamily = GoogleSansFlex),
+    headlineLarge = defaultTypography.headlineLarge.copy(fontFamily = GoogleSansFlex),
+    headlineMedium = defaultTypography.headlineMedium.copy(fontFamily = GoogleSansFlex),
+    headlineSmall = defaultTypography.headlineSmall.copy(fontFamily = GoogleSansFlex),
+    titleLarge = defaultTypography.titleLarge.copy(fontFamily = GoogleSansFlex),
+    titleMedium = defaultTypography.titleMedium.copy(fontFamily = GoogleSansFlex),
+    titleSmall = defaultTypography.titleSmall.copy(fontFamily = GoogleSansFlex),
+    bodyLarge = defaultTypography.bodyLarge.copy(fontFamily = GoogleSansFlex),
+    bodyMedium = defaultTypography.bodyMedium.copy(fontFamily = GoogleSansFlex),
+    bodySmall = defaultTypography.bodySmall.copy(fontFamily = GoogleSansFlex),
+    labelLarge = defaultTypography.labelLarge.copy(fontFamily = GoogleSansFlex),
+    labelMedium = defaultTypography.labelMedium.copy(fontFamily = GoogleSansFlex),
+    labelSmall = defaultTypography.labelSmall.copy(fontFamily = GoogleSansFlex)
 )

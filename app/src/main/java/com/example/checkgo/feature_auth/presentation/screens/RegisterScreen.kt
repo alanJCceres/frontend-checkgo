@@ -1,6 +1,5 @@
 package com.example.checkgo.feature_auth.presentation.screens
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -21,6 +20,12 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Password
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Person3
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -30,14 +35,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.checkgo.core.ui.components.CustomTextField
 import androidx.compose.runtime.*
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.checkgo.core.ui.components.CustomTextFieldClasic
 import com.example.checkgo.core.ui.components.CustomTopToast
 import com.example.checkgo.feature_auth.presentation.viewmodel.RegisterUiEvent
 import com.example.checkgo.feature_auth.presentation.viewmodel.RegisterViewModel
@@ -49,7 +55,6 @@ fun RegisterScreen(
     viewModel: RegisterViewModel= viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val postResult by viewModel.postResult.collectAsState()
     var toastMessage by remember { mutableStateOf<String?>(null) }
     var isErrorToast by remember {mutableStateOf(true)}
     val context = LocalContext.current
@@ -89,76 +94,98 @@ fun RegisterScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp,0.dp),
-            verticalArrangement = Arrangement.Center,
+                .padding(20.dp,30.dp),
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             //Formulario
-            Text(text = "Registro de usuarios", fontSize = 28.sp)
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = "Crear cuenta",
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.secondary,
+                    textAlign= TextAlign.Start,
+                    fontSize = 32.sp)
+                Text(
+                    text = "Únete a CheckGO hoy mismo y descubre su utilidad.",
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 14.sp
+                )
+            }
+
             Spacer(modifier = Modifier.height(20.dp))
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                CustomTextField(
+                CustomTextFieldClasic(
                     value=uiState.fullname,
                     onValueChange = { viewModel.onFullnameChange(it) },
                     onBlur = {viewModel.onFullnameFocusLost()},
-                    label = "Nombre completo *",
-                    placeholder = "Jhon doe",
+                    label = "nombre completo *",
+                    placeholder = "Ej. Juan Perez",
                     isError = uiState.errorFullName != null,
-                    errorMessage = uiState.errorFullName
+                    errorMessage = uiState.errorFullName,
+                    leadingIcon = Icons.Default.Person
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                CustomTextField(
+                CustomTextFieldClasic(
                     value=uiState.email,
                     onValueChange = {viewModel.onEmailChange(it)},
                     onBlur = {viewModel.onEmailFocusLost()},
-                    label = "Correo eléctronico *",
-                    placeholder = "jhon@gmail.com",
+                    label = "correo eléctronico *",
+                    placeholder = "correo@ejemplo.com",
                     isError = uiState.errorEmail != null,
                     errorMessage = uiState.errorEmail,
+                    leadingIcon = Icons.Default.Email,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Email
                     )
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                CustomTextField(
+                CustomTextFieldClasic(
                     value=uiState.userName,
                     onValueChange = {viewModel.onUserNameChange(it)},
                     onBlur = {viewModel.onUserNameFocusLost()},
-                    label = "Nombre de usuario *",
-                    placeholder = "JhonD",
+                    label = "usuario *",
+                    placeholder = "juanperez23",
                     isError = uiState.errorUserName != null,
-                    errorMessage = uiState.errorUserName
+                    errorMessage = uiState.errorUserName,
+                    leadingIcon = Icons.Default.Person3
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                CustomTextField(
+                CustomTextFieldClasic(
                     value=uiState.password,
                     onValueChange = {viewModel.onPasswordChange(it)},
                     onBlur = {viewModel.onPasswordFocusLost()},
-                    label = "Contraseña *",
+                    label = "contraseña *",
                     placeholder = "********",
                     isError = uiState.errorPassword != null,
                     errorMessage = uiState.errorPassword,
                     isPassword = true,
                     isPasswordVisible = uiState.isPasswordVisible,
                     onPasswordToggleClick = {viewModel.togglePasswordVisibility()},
+                    leadingIcon = Icons.Default.Lock,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Password
                     )
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                CustomTextField(
+                CustomTextFieldClasic(
                     value=uiState.confirmPassword,
                     onValueChange = {viewModel.onConfirmPasswordChange(it)},
-                    label = "Repite la contraseña *",
+                    label = "confirmar contraseña *",
                     placeholder = "********",
                     isError = uiState.errorConfirmPassword != null,
                     errorMessage = uiState.errorConfirmPassword,
                     isPassword = true,
                     isPasswordVisible = uiState.isConfirmPasswordVisible,
                     onPasswordToggleClick = {viewModel.toggleConfirmPasswordVisibility()},
+                    leadingIcon = Icons.Default.Password,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Password
                     )
