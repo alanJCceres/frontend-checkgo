@@ -1,10 +1,13 @@
 package com.example.checkgo.core.ui.theme
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.checkgo.R
 val GoogleSansFlex = FontFamily(
@@ -35,4 +38,20 @@ val CheckGoTypography = Typography(
     labelLarge = defaultTypography.labelLarge.copy(fontFamily = GoogleSansFlex),
     labelMedium = defaultTypography.labelMedium.copy(fontFamily = GoogleSansFlex),
     labelSmall = defaultTypography.labelSmall.copy(fontFamily = GoogleSansFlex)
+)
+
+val StyleTextSubHeader = TextStyle(
+    fontWeight = FontWeight.Medium,
+    fontSize = 14.sp,
+)
+val StyleTextTituloHeader = TextStyle(
+    fontWeight = FontWeight.Bold,
+    fontSize = 32.sp
+)
+val StyleTextBody = TextStyle(
+    fontSize = 16.sp
+)
+val StyleTextLabelInput = TextStyle(
+    fontWeight = FontWeight.SemiBold,
+    fontSize = 14.sp,
 )

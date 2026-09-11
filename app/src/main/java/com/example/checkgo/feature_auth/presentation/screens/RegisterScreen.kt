@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,14 +19,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Person3
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -34,17 +36,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.checkgo.core.ui.components.CustomTextFieldClasic
 import com.example.checkgo.core.ui.components.CustomTopToast
+import com.example.checkgo.core.ui.theme.DarkTextColorSecundario
+import com.example.checkgo.core.ui.theme.LightTextColorSecundario
+import com.example.checkgo.core.ui.theme.StyleTextSubHeader
+import com.example.checkgo.core.ui.theme.StyleTextTituloHeader
 import com.example.checkgo.feature_auth.presentation.viewmodel.RegisterUiEvent
 import com.example.checkgo.feature_auth.presentation.viewmodel.RegisterViewModel
 import kotlinx.coroutines.delay
@@ -54,6 +59,7 @@ fun RegisterScreen(
     navController: NavController,
     viewModel: RegisterViewModel= viewModel()
 ) {
+    val modoOscuro = isSystemInDarkTheme()
     val uiState by viewModel.uiState.collectAsState()
     var toastMessage by remember { mutableStateOf<String?>(null) }
     var isErrorToast by remember {mutableStateOf(true)}
@@ -89,6 +95,7 @@ fun RegisterScreen(
         modifier = Modifier
             .systemBarsPadding()
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
     ){
         //INICIO DE FORM
         Column(
@@ -106,18 +113,19 @@ fun RegisterScreen(
             ) {
                 Text(
                     text = "Crear cuenta",
-                    fontWeight = FontWeight.Bold,
+                    style = StyleTextTituloHeader,
                     color = MaterialTheme.colorScheme.secondary,
                     textAlign= TextAlign.Start,
-                    fontSize = 32.sp)
+                    )
+                Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     text = "Únete a CheckGO hoy mismo y descubre su utilidad.",
-                    fontWeight = FontWeight.Normal,
-                    fontSize = 14.sp
+                    style = StyleTextSubHeader,
+                    color = if(modoOscuro) LightTextColorSecundario else DarkTextColorSecundario
                 )
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(25.dp))
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -126,7 +134,7 @@ fun RegisterScreen(
                     value=uiState.fullname,
                     onValueChange = { viewModel.onFullnameChange(it) },
                     onBlur = {viewModel.onFullnameFocusLost()},
-                    label = "nombre completo *",
+                    label = "Nombre completo *",
                     placeholder = "Ej. Juan Perez",
                     isError = uiState.errorFullName != null,
                     errorMessage = uiState.errorFullName,
@@ -137,7 +145,7 @@ fun RegisterScreen(
                     value=uiState.email,
                     onValueChange = {viewModel.onEmailChange(it)},
                     onBlur = {viewModel.onEmailFocusLost()},
-                    label = "correo eléctronico *",
+                    label = "Correo eléctronico *",
                     placeholder = "correo@ejemplo.com",
                     isError = uiState.errorEmail != null,
                     errorMessage = uiState.errorEmail,
@@ -151,18 +159,18 @@ fun RegisterScreen(
                     value=uiState.userName,
                     onValueChange = {viewModel.onUserNameChange(it)},
                     onBlur = {viewModel.onUserNameFocusLost()},
-                    label = "usuario *",
+                    label = "Usuario *",
                     placeholder = "juanperez23",
                     isError = uiState.errorUserName != null,
                     errorMessage = uiState.errorUserName,
-                    leadingIcon = Icons.Default.Person3
+                    leadingIcon = Icons.Default.Person
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 CustomTextFieldClasic(
                     value=uiState.password,
                     onValueChange = {viewModel.onPasswordChange(it)},
                     onBlur = {viewModel.onPasswordFocusLost()},
-                    label = "contraseña *",
+                    label = "Contraseña *",
                     placeholder = "********",
                     isError = uiState.errorPassword != null,
                     errorMessage = uiState.errorPassword,
@@ -178,7 +186,7 @@ fun RegisterScreen(
                 CustomTextFieldClasic(
                     value=uiState.confirmPassword,
                     onValueChange = {viewModel.onConfirmPasswordChange(it)},
-                    label = "confirmar contraseña *",
+                    label = "Confirmar contraseña *",
                     placeholder = "********",
                     isError = uiState.errorConfirmPassword != null,
                     errorMessage = uiState.errorConfirmPassword,
@@ -190,7 +198,7 @@ fun RegisterScreen(
                         keyboardType = KeyboardType.Password
                     )
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(26.dp))
                 Button(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -221,15 +229,20 @@ fun RegisterScreen(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Ya tienes una cuenta?",
+                    Text("¿Ya tienes una cuenta?",
                         color = Color.Gray,
+                        fontSize = 14.sp
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Text("Iniciar sesión",
                         color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.clickable {
+                        fontSize = 14.sp,
+                        modifier = Modifier.clickable (
+                            enabled = !uiState.isLoading,
+                        ){
                             //aqui funcion para llevar a pantalla
-                        })
+                        }
+                    )
                 }
             }
         }

@@ -3,6 +3,7 @@ package com.example.checkgo.core.ui.components
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -28,8 +29,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
+import com.example.checkgo.core.ui.theme.StyleTextLabelInput
 
 @Composable
 fun CustomTextFieldClasic(
@@ -54,19 +55,16 @@ fun CustomTextFieldClasic(
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
             text = label,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.SemiBold,
+            style = StyleTextLabelInput,
             color = if (isError) Color.Red else Color.Gray,
             modifier = Modifier.padding(bottom = 6.dp),
-            style = TextStyle(
-            fontFeatureSettings = "smcp" // "smcp" es el código OpenType para Small Caps
-            )
         )
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
             modifier = modifier
                 .fillMaxWidth()
+                .height(56.dp)
                 .onFocusChanged { focusState ->
                     if (focusState.isFocused) hasHadFocus = true
                     else if (!focusState.isFocused && hasHadFocus) onBlur()
@@ -106,7 +104,7 @@ fun CustomTextFieldClasic(
                 unfocusedBorderColor = Color.LightGray.copy(alpha = 0.0f),
                 focusedLabelColor = Color(0xFF0B766B),
                 unfocusedLabelColor = Color.Gray,
-                unfocusedContainerColor = Color(0xFFecf2f7), //Fondo blanco sin foco
+                unfocusedContainerColor = Color(0xFFF1F3FA), //Fondo blanco sin foco
                 focusedContainerColor = Color.White, //fondo blanco cuando se haga foco
                 errorContainerColor = Color.White, //fondo blanco cuando ocurra un error
 

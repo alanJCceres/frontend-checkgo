@@ -40,8 +40,8 @@ sealed class RegisterUiEvent{
 }
 class RegisterViewModel: ViewModel() {
     private val registerUserUseCase = RegisterUserUseCase()
-    private val _postResult = MutableStateFlow<String?>(null)
-    val postResult: StateFlow<String?> = _postResult.asStateFlow()
+    //private val _postResult = MutableStateFlow<String?>(null)
+    //val postResult: StateFlow<String?> = _postResult.asStateFlow()
     private val _uiState = MutableStateFlow(RegisterUiState())
     val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
     private val _navigationEvent = Channel<RegisterUiEvent>()
