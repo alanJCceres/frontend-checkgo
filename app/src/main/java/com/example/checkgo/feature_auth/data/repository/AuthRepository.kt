@@ -1,6 +1,7 @@
 package com.example.checkgo.feature_auth.data.repository
 
 import com.example.checkgo.core.data.api.ApiHttp
+import com.example.checkgo.feature_auth.data.dto.LoginUserRequestDto
 import com.example.checkgo.feature_auth.data.dto.RegisterUserRequestDto
 import io.ktor.client.statement.HttpResponse
 
@@ -8,6 +9,9 @@ class AuthRepository {
     private val endpointBase:String = "api/v1/auth"
     suspend fun postRegisterUser(request: RegisterUserRequestDto): HttpResponse{
         return ApiHttp.post("${endpointBase}/register",request)
+    }
+    suspend fun postLoginUser(request: LoginUserRequestDto):HttpResponse{
+        return ApiHttp.post("${endpointBase}/login",request)
     }
     // Para GET: Devuelve el DTO ya parseado
 //    suspend fun getUser(userId: String): UserResponseDto {

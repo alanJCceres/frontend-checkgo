@@ -12,7 +12,17 @@ data class RegisterUserRequestDto(
     val rol: UserRole,
     val planPublicId:String
     )
-
+@Serializable
+data class LoginUserRequestDto(
+    val userName:String,
+    val password:String
+)
+@Serializable
+data class LoginUserResponseDto(
+    val accessToken:String,
+    val refreshToken:String,
+    val role:UserRole
+)
 //@Serializable
 //data class UserResponseDto(val id: Int, val name: String, val email: String) {
 //    fun toDomain() = User(id = id.toString(), fullName = name, email = email) //convertir al data del form

@@ -16,11 +16,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -28,8 +26,6 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,12 +34,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.checkgo.core.ui.components.CustomLoadingButton
 import com.example.checkgo.core.ui.components.CustomTextFieldClasic
 import com.example.checkgo.core.ui.components.CustomTopToast
 import com.example.checkgo.core.ui.theme.DarkTextColorSecundario
@@ -63,7 +59,6 @@ fun RegisterScreen(
     val uiState by viewModel.uiState.collectAsState()
     var toastMessage by remember { mutableStateOf<String?>(null) }
     var isErrorToast by remember {mutableStateOf(true)}
-    val context = LocalContext.current
 
     //Efecto para ocultar el toast automaticamente
     LaunchedEffect(toastMessage) {
@@ -199,27 +194,12 @@ fun RegisterScreen(
                     )
                 )
                 Spacer(modifier = Modifier.height(26.dp))
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    enabled = !uiState.isLoading,
-                    onClick = {viewModel.onRegisterClicked() }
-                ) {
-                    if(uiState.isLoading){
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            strokeWidth = 2.dp
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Cargando...")
-                    }else{
-                        Text("Registrarse")
-                    }
-
-                }
+                CustomLoadingButton(
+                    isLoading = uiState.isLoading,
+                    normalText = "Registrarse",
+                    loadingText = "Cargando...",
+                    onClick = { viewModel.onRegisterClicked() }
+                )
                 Spacer(modifier = Modifier.height(16.dp))
                 //PIE DE PAGINA Sing in
                 Row(

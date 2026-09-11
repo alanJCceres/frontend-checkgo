@@ -17,7 +17,7 @@ object ApiHttp {
     val client = HttpClient(Android) {
         expectSuccess = false
         defaultRequest {
-            url("http://192.168.0.2:8080/")
+            url("http://192.168.0.9:8080/")
             contentType(ContentType.Application.Json)
             //Aqui colocar interceptor de token
         }
