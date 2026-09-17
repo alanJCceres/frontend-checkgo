@@ -10,10 +10,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.checkgo.core.ui.components.CustomButton
 
 @Composable
 fun HomeAdminScreen(
-
+navController: NavController
 ) {
     Box(
         modifier = Modifier
@@ -27,6 +29,11 @@ fun HomeAdminScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(text = "HOLA MUNDO DESDE HOME ADMIN")
+            CustomButton(
+                isPrimary = false,
+                text="Agregar usuario",
+                onClick = {navController.navigate("registerUser")}
+            )
         }
     }
 

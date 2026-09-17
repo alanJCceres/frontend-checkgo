@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.checkgo.feature_admin.presentation.screens.HomeAdminScreen
+import com.example.checkgo.feature_admin.presentation.screens.RegisterUserScreen
 import com.example.checkgo.feature_auth.presentation.screens.RegisterAdminSuccScreen
 import com.example.checkgo.feature_auth.presentation.screens.RegisterScreen
 
@@ -14,7 +15,7 @@ import com.example.checkgo.feature_auth.presentation.screens.RegisterScreen
 fun AppNavigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination="inicio"){
+    NavHost(navController = navController, startDestination="HomeAdmin"){
         composable("inicio"){
             RegisterScreen(navController=navController)
         }
@@ -28,7 +29,10 @@ fun AppNavigation() {
             RegisterAdminSuccScreen(navController=navController)
         }
         composable("HomeAdmin"){
-            HomeAdminScreen()
+            HomeAdminScreen(navController=navController)
+        }
+        composable("registerUser"){
+            RegisterUserScreen()
         }
     }
 }

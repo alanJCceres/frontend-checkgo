@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun CustomButton(
@@ -93,7 +94,8 @@ fun CustomButton(
 
             Text(
                 text = text,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = if(isPrimary) Color.White else MaterialTheme.colorScheme.primary
             )
 
             if (rightIcon != null) {

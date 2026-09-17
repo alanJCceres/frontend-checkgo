@@ -12,7 +12,7 @@ class RegisterUserUseCase {
             val response = repository.postRegisterUser(request)
             return when(response.status.value){
                 201,200->{
-                    Result.success("usuario creado")
+                    Result.success("usuario creado correctamente.")
                 }
                 400 -> Result.failure(Exception("datos inválidos, por favor cierre la app y vuelva a ingresar"))
                 409 -> {
