@@ -15,7 +15,7 @@ import com.example.checkgo.feature_auth.presentation.screens.RegisterScreen
 fun AppNavigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination="HomeAdmin"){
+    NavHost(navController = navController, startDestination="inicio"){
         composable("inicio"){
             RegisterScreen(navController=navController)
         }
