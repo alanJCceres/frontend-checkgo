@@ -1,6 +1,7 @@
 package com.example.checkgo.feature_auth.presentation.viewmodel
 
 import android.R
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.checkgo.core.data.enum.UserRole
@@ -147,7 +148,12 @@ class RegisterViewModel: ViewModel() {
                 registerUserUseCase(userToSave).fold(
                     onSuccess = {
                         _uiState.update { it.copy(isLoading = false) }
-                        _navigationEvent.send(RegisterUiEvent.Navigate("registerAdminSuccScreen"))
+                        val safeUserName = Uri.encode(userToSave.userName)
+                        val safePassword = Uri.encode(userToSave.password)
+                        _navigationEvent.send(
+                            RegisterUiEvent.Navigate(
+                                "registerAdminSuccScreen/$safeUserName/$safePassword")
+                        )
                     },
                     onFailure = {exception ->
                         _uiState.update { it.copy(isLoading = false) }

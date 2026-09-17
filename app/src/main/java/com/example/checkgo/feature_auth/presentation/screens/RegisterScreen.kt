@@ -39,7 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.checkgo.core.ui.components.CustomLoadingButton
+import com.example.checkgo.core.ui.components.CustomButton
 import com.example.checkgo.core.ui.components.CustomTextFieldClasic
 import com.example.checkgo.core.ui.components.CustomTopToast
 import com.example.checkgo.core.ui.theme.DarkTextColorSecundario
@@ -194,10 +194,10 @@ fun RegisterScreen(
                     )
                 )
                 Spacer(modifier = Modifier.height(26.dp))
-                CustomLoadingButton(
-                    isLoading = uiState.isLoading,
-                    normalText = "Registrarse",
+                CustomButton(
+                    text="Registrarse",
                     loadingText = "Cargando...",
+                    isLoading = uiState.isLoading,
                     onClick = { viewModel.onRegisterClicked() }
                 )
                 Spacer(modifier = Modifier.height(16.dp))

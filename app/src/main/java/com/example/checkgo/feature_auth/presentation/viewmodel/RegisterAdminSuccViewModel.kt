@@ -1,5 +1,6 @@
 package com.example.checkgo.feature_auth.presentation.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.checkgo.feature_auth.data.dto.LoginUserRequestDto
@@ -19,8 +20,12 @@ sealed class RegisterSuccUiEvent{
     data class Navigate(val route: String): RegisterSuccUiEvent()
     data class ShowToast(val message: String): RegisterSuccUiEvent()
 }
-class RegisterAdminSuccViewModel: ViewModel() {
-   private val loginUserUseCase = LoginUserUseCase()
+class RegisterAdminSuccViewModel(
+    savedStateHandle: SavedStateHandle, //captura los parametros que se envian desde la pantalla anterior
+): ViewModel() {
+    private val userName: String = checkNotNull(savedStateHandle["userName"])
+    private val password: String = checkNotNull(savedStateHandle["password"])
+    private val loginUserUseCase = LoginUserUseCase()
     private val _uiState = MutableStateFlow(RegisterSuccUiState())
     val uiState: StateFlow<RegisterSuccUiState> = _uiState.asStateFlow()
     private val _navigationEvent = Channel<RegisterSuccUiEvent>()
@@ -29,8 +34,8 @@ class RegisterAdminSuccViewModel: ViewModel() {
     fun onContinueClicked(){
         _uiState.update { it.copy(isLoading = true) }
         val login= LoginUserRequestDto(
-            userName = "alan",
-            password = "12345678"
+            userName = userName,
+            password = password
         )
         viewModelScope.launch {
             loginUserUseCase(login).fold(
