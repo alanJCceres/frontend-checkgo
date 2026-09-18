@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.*
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun CustomTextField(
@@ -107,6 +108,7 @@ fun CustomTextField(
             Text(
                 text = errorMessage,
                 color = Color.Red,
+                fontSize = 14.sp,
                 modifier = Modifier.padding(start = 16.dp, top = 4.dp)
             )
         }

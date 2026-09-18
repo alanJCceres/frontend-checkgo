@@ -161,7 +161,6 @@ class RegisterViewModel: ViewModel() {
                 )
             }
         }
-
     }
     fun inputsInvalidos(): Boolean{
         var res: Boolean=false
@@ -172,6 +171,10 @@ class RegisterViewModel: ViewModel() {
         val emailError = EmailValidator.validate(currentState.email)
         if(fullnameError!=null || userNameError!=null ||
             passwordError!=null || emailError!=null || currentState.errorConfirmPassword!=null){
+            onFullnameFocusLost()
+            onUserNameFocusLost()
+            onPasswordFocusLost()
+            onEmailFocusLost()
             res=true
         }
         return res

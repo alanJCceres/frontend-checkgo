@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
@@ -211,16 +212,17 @@ fun RegisterScreen(
                 ) {
                     Text("¿Ya tienes una cuenta?",
                         color = Color.Gray,
-                        fontSize = 14.sp
+                        fontSize = 12.sp
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Text("Iniciar sesión",
                         color = MaterialTheme.colorScheme.primary,
-                        fontSize = 14.sp,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable (
                             enabled = !uiState.isLoading,
                         ){
-                            //aqui funcion para llevar a pantalla
+                            navController.navigate("login")
                         }
                     )
                 }

@@ -1,6 +1,11 @@
 package com.example.checkgo.feature_auth.presentation.screens
 
 import android.app.Activity
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,23 +53,31 @@ import com.example.checkgo.core.ui.components.CustomButton
 import com.example.checkgo.core.ui.components.CustomTextField
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.checkgo.core.ui.components.CustomTopToast
 import com.example.checkgo.core.ui.theme.DarkTextColorSecundario
 import com.example.checkgo.core.ui.theme.LightTextColorSecundario
+import com.example.checkgo.feature_auth.presentation.viewmodel.LoginUiEvent
+import com.example.checkgo.feature_auth.presentation.viewmodel.LoginViewModel
+import com.example.checkgo.feature_auth.presentation.viewmodel.RegisterSuccUiEvent
+import kotlinx.coroutines.delay
 
 @Composable
 fun LoginScreen(
-    navController: NavController
+    navController: NavController,
+    viewModel: LoginViewModel = viewModel()
 ) {
 
     val modoOscuro = isSystemInDarkTheme()
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    val uiState by viewModel.uiState.collectAsState()
+    var toastMessage by remember { mutableStateOf<String?>(null) }
+    var isErrorToast by remember {mutableStateOf(true)}
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
 
-    val context = LocalContext.current
     // Efecto para ocultar y mostrar la barra de estado
+    val context = LocalContext.current
     DisposableEffect(Unit) {
         val window = (context as? Activity)?.window
         val insetsController = window?.let { WindowCompat.getInsetsController(it, it.decorView) }
@@ -79,6 +92,31 @@ fun LoginScreen(
             insetsController?.show(WindowInsetsCompat.Type.statusBars())
         }
     }
+
+    LaunchedEffect(toastMessage) {
+        if (toastMessage!=null){
+            delay(4000)
+            toastMessage=null
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvent.collect{ event ->
+            when(event){
+                is LoginUiEvent.Navigate -> {
+                    navController.navigate(event.route){
+                        popUpTo("login"){inclusive=true}
+                    }
+                }
+                is LoginUiEvent.ShowErrorToast ->{
+                    isErrorToast=true
+                    toastMessage=event.message
+                }
+            }
+        }
+    }
+
+    //INTERFAZ
     Box(modifier = Modifier.fillMaxSize())
     {
         Column(
@@ -116,9 +154,9 @@ fun LoginScreen(
                     Text(
                         text = "Inicia sesión para continuar",
                         color = Color.White,
-                        fontSize = 14.sp,
+                        fontSize = 13.sp,
                         textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = FontWeight.Medium,
                     )
                 }
 
@@ -133,21 +171,27 @@ fun LoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 CustomTextField(
-                    value=email,
-                    onValueChange = {},
-                    onBlur = {},
+                    value=uiState.userName,
+                    onValueChange = {viewModel.onUserNameChange(it)},
+                    onBlur = {viewModel.onUserNameFocusLost()},
                     label = "Usuario",
                     placeholder = "user123",
+                    isError = uiState.errorUserName != null,
+                    errorMessage = uiState.errorUserName,
                     leadingIcon = Icons.Default.Person
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 CustomTextField(
-                    value= password,
-                    onValueChange = {},
-                    onBlur = {},
+                    value=uiState.password,
+                    onValueChange = {viewModel.onPasswordChange(it)},
+                    onBlur = {viewModel.onPasswordFocusLost()},
                     label = "Contraseña",
                     placeholder = "********",
+                    isError = uiState.errorPassword != null,
+                    errorMessage = uiState.errorPassword,
                     isPassword = true,
+                    isPasswordVisible = uiState.isPasswordVisible,
+                    onPasswordToggleClick = {viewModel.togglePasswordVisibility()},
                     leadingIcon = Icons.Default.Lock,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Password
@@ -159,13 +203,18 @@ fun LoginScreen(
                     fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = if(modoOscuro) MaterialTheme.colorScheme.primary else DarkTextColorSecundario,
-                    modifier = Modifier.align(Alignment.End)
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .clickable (enabled = !uiState.isLoading){
+                            //navController.navigate("pantallaRecuperar")
+                        }
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 CustomButton(
                     text="Iniciar sesión",
                     loadingText = "Cargando...",
-                    onClick = {  }
+                    isLoading = uiState.isLoading,
+                    onClick = { viewModel.onLoginClicked() }
                 )
                 Spacer(modifier = Modifier.height(5.dp))
                 Row(
@@ -185,12 +234,22 @@ fun LoginScreen(
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable (
-                            //enabled = !uiState.isLoading,
+                            enabled = !uiState.isLoading,
                         ){
                             navController.navigate("registerAdmin")
                         }
                     )
                 }
+            }
+        }
+        AnimatedVisibility(
+            visible = toastMessage != null,
+            enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
+            exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut(),
+            modifier = Modifier.align(Alignment.TopCenter)
+        ) {
+            toastMessage?.let { message ->
+                CustomTopToast(message = message, isError = isErrorToast)
             }
         }
     }

@@ -101,10 +101,10 @@ fun CustomTextFieldClasic(
             colors = OutlinedTextFieldDefaults.colors(
                 // Colores en estado normal
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = Color.LightGray.copy(alpha = 0.0f),
+                unfocusedBorderColor = Color.LightGray.copy(alpha = 0.6f),
                 focusedLabelColor = Color(0xFF0B766B),
                 unfocusedLabelColor = Color.Gray,
-                unfocusedContainerColor = Color(0xFFF1F3FA), //Fondo blanco sin foco
+                unfocusedContainerColor = Color.White, //Fondo blanco sin foco ///Color(0xFFF1F3FA)
                 focusedContainerColor = Color.White, //fondo blanco cuando se haga foco
                 errorContainerColor = Color.White, //fondo blanco cuando ocurra un error
 
