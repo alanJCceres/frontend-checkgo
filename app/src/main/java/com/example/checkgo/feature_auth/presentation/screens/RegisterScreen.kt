@@ -74,7 +74,7 @@ fun RegisterScreen(
             when(event){
                 is RegisterUiEvent.Navigate -> {
                     navController.navigate(event.route){
-                        popUpTo("inicio"){inclusive=true}
+                        popUpTo("registerAdmin"){inclusive=true}
                     }
                 }
                 is RegisterUiEvent.ShowToast ->{
