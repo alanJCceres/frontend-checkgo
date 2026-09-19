@@ -226,12 +226,12 @@ fun LoginScreen(
                 ) {
                     Text("¿Eres admin y no tienes cuenta?",
                         color = Color.Gray,
-                        fontSize = 12.sp
+                        fontSize = 13.sp
                     )
                     Spacer(modifier = Modifier.width(10.dp))
                     Text("Crear cuenta",
                         color = MaterialTheme.colorScheme.primary,
-                        fontSize = 12.sp,
+                        fontSize = 13.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.clickable (
                             enabled = !uiState.isLoading,

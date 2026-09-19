@@ -2,6 +2,7 @@ package com.example.checkgo.feature_auth.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.checkgo.core.data.enum.UserRole
 import com.example.checkgo.feature_auth.data.dto.LoginUserRequestDto
 import com.example.checkgo.feature_auth.domain.usecase.LoginUserUseCase
 import com.example.checkgo.feature_auth.domain.validators.PasswordValidator
@@ -74,9 +75,23 @@ class LoginViewModel: ViewModel() {
             )
             viewModelScope.launch {
                 loginUserUseCase(login).fold(
-                    onSuccess = {
+                    onSuccess = { role ->
                         _uiState.update { it.copy(isLoading = false) }
-                        _navigationEvent.send(LoginUiEvent.Navigate("HomeAdmin"))
+                        val role = runCatching {
+                            UserRole.valueOf(role)
+                        }.getOrNull()
+
+                        when (role) {
+                            UserRole.SUPER_ADMIN -> {
+                                _navigationEvent.send(LoginUiEvent.Navigate("homeAdmin"))
+                            }
+                            UserRole.USER -> {
+                                _navigationEvent.send(LoginUiEvent.Navigate("homeUser"))
+                            }
+                            else -> {
+                                _navigationEvent.send(LoginUiEvent.ShowErrorToast("Error al obtener el rol, porfavor cierre la app y vuelva a ingresar."))
+                            }
+                        }
                     },
                     onFailure = {exception ->
                         _uiState.update { it.copy(isLoading = false) }

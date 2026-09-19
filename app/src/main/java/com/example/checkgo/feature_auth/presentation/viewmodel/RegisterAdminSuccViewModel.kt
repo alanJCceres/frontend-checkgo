@@ -41,7 +41,7 @@ class RegisterAdminSuccViewModel(
             loginUserUseCase(login).fold(
                 onSuccess = {
                     _uiState.update { it.copy(isLoading = false) }
-                    _navigationEvent.send(RegisterSuccUiEvent.Navigate("HomeAdmin"))
+                    _navigationEvent.send(RegisterSuccUiEvent.Navigate("homeAdmin"))
                 },
                 onFailure = {exception ->
                     _uiState.update { it.copy(isLoading = false) }

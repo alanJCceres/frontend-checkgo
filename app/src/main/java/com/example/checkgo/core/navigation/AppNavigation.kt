@@ -11,6 +11,7 @@ import com.example.checkgo.feature_admin.presentation.screens.RegisterUserScreen
 import com.example.checkgo.feature_auth.presentation.screens.LoginScreen
 import com.example.checkgo.feature_auth.presentation.screens.RegisterAdminSuccScreen
 import com.example.checkgo.feature_auth.presentation.screens.RegisterScreen
+import com.example.checkgo.feature_user.presentation.screens.HomeUserScreen
 
 @Composable
 fun AppNavigation() {
@@ -32,8 +33,11 @@ fun AppNavigation() {
         ) {
             RegisterAdminSuccScreen(navController=navController)
         }
-        composable("HomeAdmin"){
+        composable("homeAdmin"){
             HomeAdminScreen(navController=navController)
+        }
+        composable("homeUser"){
+            HomeUserScreen()
         }
         composable("registerUser"){
             RegisterUserScreen()
