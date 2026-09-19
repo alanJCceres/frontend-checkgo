@@ -7,7 +7,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,20 +51,18 @@ import com.example.checkgo.core.ui.components.CustomButton
 import com.example.checkgo.core.ui.components.CustomTextField
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.checkgo.core.ui.components.CustomTopToast
 import com.example.checkgo.core.ui.theme.DarkTextColorSecundario
-import com.example.checkgo.core.ui.theme.LightTextColorSecundario
 import com.example.checkgo.feature_auth.presentation.viewmodel.LoginUiEvent
 import com.example.checkgo.feature_auth.presentation.viewmodel.LoginViewModel
-import com.example.checkgo.feature_auth.presentation.viewmodel.RegisterSuccUiEvent
 import kotlinx.coroutines.delay
 
 @Composable
 fun LoginScreen(
     navController: NavController,
-    viewModel: LoginViewModel = viewModel()
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
 
     val modoOscuro = isSystemInDarkTheme()

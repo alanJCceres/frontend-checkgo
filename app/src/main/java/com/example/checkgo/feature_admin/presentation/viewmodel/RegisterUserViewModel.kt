@@ -8,6 +8,7 @@ import com.example.checkgo.feature_auth.domain.usecase.RegisterUserUseCase
 import com.example.checkgo.feature_auth.domain.validators.FullNameValidator
 import com.example.checkgo.feature_auth.domain.validators.PasswordValidator
 import com.example.checkgo.feature_auth.domain.validators.UserNameValidator
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class RegisterUserUiState(
     val fullname: String="",
@@ -34,9 +36,10 @@ sealed class RegisterUserUiEvent{
     data class ShowSuccessToast(val message: String): RegisterUserUiEvent()
     data class ShowErrorToast(val message: String): RegisterUserUiEvent()
 }
-
-class RegisterUserViewModel: ViewModel() {
-    private val registerUserUseCase = RegisterUserUseCase()
+@HiltViewModel
+class RegisterUserViewModel @Inject constructor(
+    private val registerUserUseCase: RegisterUserUseCase
+) : ViewModel() {
     private val _uiState = MutableStateFlow(RegisterUserUiState())
     val uiState: StateFlow<RegisterUserUiState> = _uiState.asStateFlow()
     private val _navigationEvent = Channel<RegisterUserUiEvent>()

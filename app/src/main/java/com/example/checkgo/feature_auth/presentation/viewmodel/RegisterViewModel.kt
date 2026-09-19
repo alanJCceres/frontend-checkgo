@@ -6,11 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.checkgo.core.data.enum.UserRole
 import com.example.checkgo.feature_auth.data.dto.RegisterUserRequestDto
+import com.example.checkgo.feature_auth.domain.usecase.LoginUserUseCase
 import com.example.checkgo.feature_auth.domain.usecase.RegisterUserUseCase
 import com.example.checkgo.feature_auth.domain.validators.EmailValidator
 import com.example.checkgo.feature_auth.domain.validators.FullNameValidator
 import com.example.checkgo.feature_auth.domain.validators.PasswordValidator
 import com.example.checkgo.feature_auth.domain.validators.UserNameValidator
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class RegisterUiState(
     val fullname: String="",
@@ -39,8 +42,10 @@ sealed class RegisterUiEvent{
     data class Navigate(val route: String): RegisterUiEvent()
     data class ShowToast(val message: String): RegisterUiEvent()
 }
-class RegisterViewModel: ViewModel() {
-    private val registerUserUseCase = RegisterUserUseCase()
+@HiltViewModel
+class RegisterViewModel @Inject constructor(
+    private val registerUserUseCase: RegisterUserUseCase
+) : ViewModel() {
     private val _uiState = MutableStateFlow(RegisterUiState())
     val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
     private val _navigationEvent = Channel<RegisterUiEvent>()

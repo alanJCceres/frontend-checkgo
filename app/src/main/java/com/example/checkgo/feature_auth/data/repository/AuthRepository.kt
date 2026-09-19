@@ -1,17 +1,26 @@
 package com.example.checkgo.feature_auth.data.repository
 
-import com.example.checkgo.core.data.api.ApiHttp
 import com.example.checkgo.feature_auth.data.dto.LoginUserRequestDto
 import com.example.checkgo.feature_auth.data.dto.RegisterUserRequestDto
+import io.ktor.client.HttpClient
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
+import javax.inject.Inject
 
-class AuthRepository {
+class AuthRepository @Inject constructor(
+    private val client: HttpClient
+) {
     private val endpointBase:String = "api/v1/auth"
     suspend fun postRegisterUser(request: RegisterUserRequestDto): HttpResponse{
-        return ApiHttp.post("${endpointBase}/register",request)
+        return client.post("${endpointBase}/register") {
+            setBody(request)
+        }
     }
     suspend fun postLoginUser(request: LoginUserRequestDto):HttpResponse{
-        return ApiHttp.post("${endpointBase}/login",request)
+        return client.post("${endpointBase}/login") {
+            setBody(request)
+        }
     }
     // Para GET: Devuelve el DTO ya parseado
 //    suspend fun getUser(userId: String): UserResponseDto {

@@ -7,6 +7,7 @@ import com.example.checkgo.feature_auth.data.dto.LoginUserRequestDto
 import com.example.checkgo.feature_auth.domain.usecase.LoginUserUseCase
 import com.example.checkgo.feature_auth.domain.validators.PasswordValidator
 import com.example.checkgo.feature_auth.domain.validators.UserNameValidator
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class LoginUiState(
     val userName: String="",
@@ -28,9 +30,10 @@ sealed class LoginUiEvent{
     data class Navigate(val route: String): LoginUiEvent()
     data class ShowErrorToast(val message: String): LoginUiEvent()
 }
-
-class LoginViewModel: ViewModel() {
-    private val loginUserUseCase = LoginUserUseCase()
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val loginUserUseCase: LoginUserUseCase
+) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
     private val _navigationEvent = Channel<LoginUiEvent>()

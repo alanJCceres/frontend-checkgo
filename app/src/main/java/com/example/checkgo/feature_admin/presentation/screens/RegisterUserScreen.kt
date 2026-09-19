@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.checkgo.core.ui.components.CustomButton
 import com.example.checkgo.core.ui.components.CustomTextFieldClasic
@@ -50,7 +51,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun RegisterUserScreen(
-    viewModel: RegisterUserViewModel = viewModel()
+    viewModel: RegisterUserViewModel = hiltViewModel()
 ) {
     val modoOscuro = isSystemInDarkTheme()
     val uiState by viewModel.uiState.collectAsState()

@@ -33,6 +33,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.checkgo.R
@@ -50,7 +51,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun RegisterAdminSuccScreen(
     navController: NavController,
-    viewModel: RegisterAdminSuccViewModel = viewModel()
+    viewModel: RegisterAdminSuccViewModel = hiltViewModel()
 ) {
     val modoOscuro = isSystemInDarkTheme()
     val uiState by viewModel.uiState.collectAsState()

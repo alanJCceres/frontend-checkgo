@@ -1,19 +1,28 @@
 package com.example.checkgo.feature_auth.domain.usecase
 
 import com.example.checkgo.core.data.dto.ErrorResponseDto
+import com.example.checkgo.core.data.localStorage.TokenManager
 import com.example.checkgo.feature_auth.data.dto.LoginUserRequestDto
 import com.example.checkgo.feature_auth.data.dto.LoginUserResponseDto
 import com.example.checkgo.feature_auth.data.repository.AuthRepository
 import io.ktor.client.call.body
+import javax.inject.Inject
 
-class LoginUserUseCase {
-    private val repository = AuthRepository()
+class LoginUserUseCase @Inject constructor(
+    private val repository: AuthRepository,
+    private val tokenManager: TokenManager
+) {
     suspend operator fun invoke(request: LoginUserRequestDto):Result<String>{
         try{
             val response = repository.postLoginUser(request)
             return when(response.status.value){
                 200->{
                     val successBody = response.body<LoginUserResponseDto>()
+                    tokenManager.saveTokens(
+                        accessToken = successBody.accessToken,
+                        refreshToken = successBody.refreshToken,
+                        role = successBody.role.toString()
+                    )
                     Result.success(successBody.role.toString())
                 }
                 400,401,409 -> {
