@@ -1,14 +1,10 @@
-package com.example.checkgo.feature_auth.presentation.viewmodel
+package com.example.checkgo.feature_admin.presentation.viewmodel
 
-import android.R
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.checkgo.core.data.enum.UserRole
 import com.example.checkgo.feature_auth.data.dto.RegisterUserRequestDto
-import com.example.checkgo.feature_auth.domain.usecase.LoginUserUseCase
 import com.example.checkgo.feature_auth.domain.usecase.RegisterUserUseCase
-import com.example.checkgo.feature_auth.domain.validators.EmailValidator
 import com.example.checkgo.feature_auth.domain.validators.FullNameValidator
 import com.example.checkgo.feature_auth.domain.validators.PasswordValidator
 import com.example.checkgo.feature_auth.domain.validators.UserNameValidator
@@ -22,9 +18,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class RegisterUiState(
+data class RegisterUserUiState(
     val fullname: String="",
-    val email: String="",
     val userName: String="",
     val password: String="",
     val confirmPassword: String="",
@@ -32,47 +27,29 @@ data class RegisterUiState(
     val isConfirmPasswordVisible: Boolean=false,
 
     val errorFullName: String? = null,
-    val errorEmail: String? = null,
     val errorUserName: String? = null,
     val errorPassword: String? = null,
     val errorConfirmPassword: String? = null,
     val isLoading: Boolean=false,
 )
-sealed class RegisterUiEvent{
-    data class Navigate(val route: String): RegisterUiEvent()
-    data class ShowToast(val message: String): RegisterUiEvent()
+sealed class RegisterUserUiEvent{
+    data class ShowSuccessToast(val message: String): RegisterUserUiEvent()
+    data class ShowErrorToast(val message: String): RegisterUserUiEvent()
 }
 @HiltViewModel
-class RegisterViewModel @Inject constructor(
+class RegisterUserViewModel @Inject constructor(
     private val registerUserUseCase: RegisterUserUseCase
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(RegisterUiState())
-    val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
-    private val _navigationEvent = Channel<RegisterUiEvent>()
+    private val _uiState = MutableStateFlow(RegisterUserUiState())
+    val uiState: StateFlow<RegisterUserUiState> = _uiState.asStateFlow()
+    private val _navigationEvent = Channel<RegisterUserUiEvent>()
     val navigationEvent = _navigationEvent.receiveAsFlow()
-    // -- ESTADO GET (Reactivo) --
-//    private val _currentUserId = MutableStateFlow("1")
-//    val userQueryState: StateFlow<StoreReadResponse<User>> = _currentUserId
-//        .flatMapLatest { id -> getUserUseCase(id) }
-//        .stateIn(
-//            scope = viewModelScope,
-//            started = SharingStarted.WhileSubscribed(5000),
-//            initialValue = StoreReadResponse.Loading(origin = StoreReadResponse.Origin.Fetcher)
-//        )
 
     fun onFullnameChange(newFullname:String){
         _uiState.update { estadoActual ->
             estadoActual.copy(
                 fullname = newFullname,
                 errorFullName = null
-            )
-        }
-    }
-    fun onEmailChange(newEmail:String){
-        _uiState.update{estadoActual ->
-            estadoActual.copy(
-                email = newEmail,
-                errorEmail = null
             )
         }
     }
@@ -114,13 +91,6 @@ class RegisterViewModel @Inject constructor(
             errorFullName = validationError
         ) }
     }
-    fun onEmailFocusLost(){
-        val estadoActual = _uiState.value
-        val validationError = EmailValidator.validate(estadoActual.email)
-        _uiState.update { it.copy(
-            errorEmail = validationError
-        ) }
-    }
     fun onUserNameFocusLost(){
         val estadoActual = _uiState.value
         val validationError = UserNameValidator.validate(estadoActual.userName)
@@ -141,31 +111,26 @@ class RegisterViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             val userToSave = RegisterUserRequestDto(
                 fullname = currentState.fullname,
-                email=currentState.email,
                 userName = currentState.userName,
                 password = currentState.password,
-                rol = UserRole.SUPER_ADMIN,
-                planPublicId = "a633b916-149e-4a0a-a527-799e4b7ba78f"
+                rol = UserRole.USER,
             )
             viewModelScope.launch {
                 registerUserUseCase(userToSave).fold(
-                    onSuccess = {
+                    onSuccess = { message ->
                         _uiState.update { it.copy(isLoading = false) }
-                        val safeUserName = Uri.encode(userToSave.userName)
-                        val safePassword = Uri.encode(userToSave.password)
-                        _navigationEvent.send(
-                            RegisterUiEvent.Navigate(
-                                "registerAdminSuccScreen/$safeUserName/$safePassword")
-                        )
+                        _navigationEvent.send(RegisterUserUiEvent.ShowSuccessToast(message))
+                        _uiState.update { RegisterUserUiState() }
                     },
                     onFailure = {exception ->
                         _uiState.update { it.copy(isLoading = false) }
                         val errorMessage = exception.message?:"Error desconocido"
-                        _navigationEvent.send(RegisterUiEvent.ShowToast(errorMessage))
+                        _navigationEvent.send(RegisterUserUiEvent.ShowErrorToast(errorMessage))
                     }
                 )
             }
         }
+
     }
     fun inputsInvalidos(): Boolean{
         var res: Boolean=false
@@ -173,13 +138,8 @@ class RegisterViewModel @Inject constructor(
         val fullnameError = FullNameValidator.validate(currentState.fullname)
         val userNameError = UserNameValidator.validate(currentState.userName)
         val passwordError = PasswordValidator.validate(currentState.password)
-        val emailError = EmailValidator.validate(currentState.email)
         if(fullnameError!=null || userNameError!=null ||
-            passwordError!=null || emailError!=null || currentState.errorConfirmPassword!=null){
-            onFullnameFocusLost()
-            onUserNameFocusLost()
-            onPasswordFocusLost()
-            onEmailFocusLost()
+            passwordError!=null || currentState.errorConfirmPassword!=null){
             res=true
         }
         return res

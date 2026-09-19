@@ -1,18 +1,21 @@
 package com.example.checkgo.feature_auth.domain.usecase
 
 import com.example.checkgo.core.data.dto.ErrorResponseDto
+import com.example.checkgo.core.data.localStorage.TokenManager
 import com.example.checkgo.feature_auth.data.dto.RegisterUserRequestDto
 import com.example.checkgo.feature_auth.data.repository.AuthRepository
 import io.ktor.client.call.body
+import javax.inject.Inject
 
-class RegisterUserUseCase {
-    private val repository = AuthRepository()
+class RegisterUserUseCase @Inject constructor(
+    private val repository: AuthRepository
+) {
     suspend operator fun invoke(request: RegisterUserRequestDto):Result<String>{
         try{
             val response = repository.postRegisterUser(request)
             return when(response.status.value){
                 201,200->{
-                    Result.success("usuario creado")
+                    Result.success("usuario creado correctamente.")
                 }
                 400 -> Result.failure(Exception("datos inválidos, por favor cierre la app y vuelva a ingresar"))
                 409 -> {

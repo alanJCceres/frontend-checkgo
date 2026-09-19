@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization) //para serializacion
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -63,4 +65,13 @@ dependencies {
     implementation(libs.bundles.ktor.client) // Implementamos todo el bundle de Ktor
     implementation(libs.kotlinx.serialization.json) // Kotlinx Serialization
     implementation(libs.store5) // Store5
+    // Para guardar los tokens de forma segura
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+// Plugin de autenticación de Ktor
+    implementation("io.ktor:ktor-client-auth:2.3.11")
+    // implementados hilt
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
+
 }

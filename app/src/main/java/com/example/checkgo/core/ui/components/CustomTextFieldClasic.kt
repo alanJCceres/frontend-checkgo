@@ -3,6 +3,7 @@ package com.example.checkgo.core.ui.components
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -12,24 +13,27 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.*
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.checkgo.core.ui.theme.StyleTextLabelInput
 
 @Composable
-fun CustomTextField(
+fun CustomTextFieldClasic(
     value: String,
     onValueChange: (String) -> Unit,
     onBlur: () -> Unit = {},
@@ -49,15 +53,22 @@ fun CustomTextField(
     val isDark = isSystemInDarkTheme()
     val leadingIconColor = if (isDark) Color(0xFF6B7280) else Color(0xFF9CA3AF)
     Column(modifier = modifier.fillMaxWidth()) {
+        Text(
+            text = label,
+            style = StyleTextLabelInput,
+            color = if (isError) Color.Red else Color.Gray,
+            modifier = Modifier.padding(bottom = 6.dp),
+        )
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
             modifier = modifier
                 .fillMaxWidth()
+                .height(56.dp)
                 .onFocusChanged { focusState ->
-                if (focusState.isFocused) hasHadFocus = true
-                else if (!focusState.isFocused && hasHadFocus) onBlur()
-            },
+                    if (focusState.isFocused) hasHadFocus = true
+                    else if (!focusState.isFocused && hasHadFocus) onBlur()
+                },
             visualTransformation = if(isPassword && !isPasswordVisible){
                 PasswordVisualTransformation()
             }else{
@@ -82,19 +93,18 @@ fun CustomTextField(
                 Icon(imageVector = it,
                     tint = leadingIconColor,
                     contentDescription = null) } },
-            label = { Text(text = label) },
             placeholder = { Text(text = placeholder) },
             isError = isError,
             keyboardOptions = keyboardOptions,
             singleLine = true,
-            shape = RoundedCornerShape(14.dp), // Bordes más redondeados y suaves
+            shape = RoundedCornerShape(14.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 // Colores en estado normal
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
                 unfocusedBorderColor = Color.LightGray.copy(alpha = 0.6f),
-                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                focusedLabelColor = Color(0xFF0B766B),
                 unfocusedLabelColor = Color.Gray,
-                unfocusedContainerColor = Color.White, //Fondo blanco sin foco
+                unfocusedContainerColor = Color.White, //Fondo blanco sin foco ///Color(0xFFF1F3FA)
                 focusedContainerColor = Color.White, //fondo blanco cuando se haga foco
                 errorContainerColor = Color.White, //fondo blanco cuando ocurra un error
 
@@ -113,6 +123,4 @@ fun CustomTextField(
             )
         }
     }
-
-
 }

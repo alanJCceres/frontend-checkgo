@@ -14,6 +14,9 @@ uiUnit = "1.11.2" #para usar dp o DP
 ktor = "2.3.11" #para conexion http backend
 kotlinx-serialization = "1.6.3" #para serializacion json
 store5 = "5.0.0" #para cache de peticiones tipo tanstack query
+hilt = "2.59.2" # para inyeccion de dependecias
+hiltNavigationCompose = "1.2.0"
+ksp = "2.3.10"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -49,11 +52,17 @@ ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 # Store5 tipo tanstack query
 store5 = { group = "org.mobilenativefoundation.store", name = "store5", version.ref = "store5" }
+# Hilt para inyeccion de dependecias
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
+hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" } # Kotlinx Serialization json
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" } #ksp para hilt
 
 [bundles]
 # Agrupamos Ktor para no llamar a cada uno por separado en el gradle
