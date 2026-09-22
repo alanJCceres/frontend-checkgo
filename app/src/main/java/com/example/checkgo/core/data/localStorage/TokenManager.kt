@@ -32,6 +32,7 @@ class TokenManager @Inject constructor(
 
     fun getAccessToken(): String? = sharedPreferences.getString("ACCESS_TOKEN", null)
     fun getRefreshToken(): String? = sharedPreferences.getString("REFRESH_TOKEN", null)
+    fun getRole(): String? = sharedPreferences.getString("ROLE",null)
     fun clearAll() {
         sharedPreferences.edit().clear().apply()
     }

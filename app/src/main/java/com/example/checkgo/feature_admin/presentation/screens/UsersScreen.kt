@@ -10,15 +10,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.checkgo.core.ui.components.CustomButton
-import com.example.checkgo.feature_admin.presentation.viewmodel.HomeAdminViewModel
 
 @Composable
-fun HomeAdminScreen(
-navController: NavController,
-viewModel: HomeAdminViewModel= hiltViewModel()
+fun UsersScreen(
+    navController: NavController
 ) {
     Box(
         modifier = Modifier
@@ -31,25 +28,12 @@ viewModel: HomeAdminViewModel= hiltViewModel()
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "HOME ADMIN")
+            Text(text = "USUARIOS REGISTRADOS")
             CustomButton(
                 isPrimary = false,
                 text="Agregar usuario",
                 onClick = {navController.navigate("registerUser")}
             )
-            CustomButton(
-                text="cerrar sesion",
-                onClick = {
-                    viewModel.logout {
-                        navController.navigate("login") {
-                            popUpTo(navController.graph.id) {
-                                inclusive = true
-                            }
-                        }
-                    }
-                }
-            )
         }
     }
-
 }
