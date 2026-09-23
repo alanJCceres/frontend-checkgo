@@ -15,8 +15,9 @@ ktor = "2.3.11" #para conexion http backend
 kotlinx-serialization = "1.6.3" #para serializacion json
 store5 = "5.0.0" #para cache de peticiones tipo tanstack query
 hilt = "2.59.2" # para inyeccion de dependecias
-hiltNavigationCompose = "1.2.0"
-ksp = "2.3.10"
+hiltNavigationCompose = "1.2.0" #para inyectar el viewModel con inyeccion de dependencias
+ksp = "2.3.10" # necesario para usar hilt
+securityCrypto = "1.1.0-alpha06" #version de security crypto para guardar tokens de forma segura
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -48,6 +49,7 @@ ktor-client-android = { group = "io.ktor", name = "ktor-client-android", version
 ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor" }
+ktor-client-auth = { group = "io.ktor", name = "ktor-client-auth", version.ref = "ktor" } #Plugin de autenticación de Ktor
 # Kotlinx Serialization json
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 # Store5 tipo tanstack query
@@ -56,6 +58,9 @@ store5 = { group = "org.mobilenativefoundation.store", name = "store5", version.
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+#Para guardar los tokens de forma segura
+security-crypto = { group = "androidx.security", name = "security-crypto", version.ref = "securityCrypto" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

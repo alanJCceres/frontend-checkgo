@@ -66,12 +66,11 @@ dependencies {
     implementation(libs.kotlinx.serialization.json) // Kotlinx Serialization
     implementation(libs.store5) // Store5
     // Para guardar los tokens de forma segura
-    implementation("androidx.security:security-crypto:1.1.0-alpha06")
-// Plugin de autenticación de Ktor
-    implementation("io.ktor:ktor-client-auth:2.3.11")
+    implementation(libs.security.crypto)
+    // Plugin de autenticación de Ktor
+    implementation(libs.ktor.client.auth)
     // implementados hilt
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
-
 }

@@ -10,16 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import com.example.checkgo.core.ui.components.CustomButton
-import com.example.checkgo.feature_user.presentation.viewmodel.HomeUserViewModel
 
 @Composable
-fun HomeUserScreen(
-    navController: NavController,
-    viewModel: HomeUserViewModel = hiltViewModel()
-) {
+fun ReportsUserScreen() {
     Box(
         modifier = Modifier
             .systemBarsPadding()
@@ -31,19 +24,7 @@ fun HomeUserScreen(
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "HOLA MUNDO DESDE HOME USER")
+            Text(text = "REPORTES DE USUARIO")
         }
-        CustomButton(
-            text="cerrar sesion",
-            onClick = {
-                viewModel.logout {
-                    navController.navigate("login") {
-                        popUpTo(navController.graph.id) {
-                            inclusive = true
-                        }
-                    }
-                }
-            }
-        )
     }
 }

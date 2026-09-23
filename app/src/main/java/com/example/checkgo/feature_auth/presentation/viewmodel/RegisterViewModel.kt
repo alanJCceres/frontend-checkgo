@@ -174,6 +174,9 @@ class RegisterViewModel @Inject constructor(
         val userNameError = UserNameValidator.validate(currentState.userName)
         val passwordError = PasswordValidator.validate(currentState.password)
         val emailError = EmailValidator.validate(currentState.email)
+        if(currentState.confirmPassword.isEmpty()){
+            _uiState.update { it.copy(errorConfirmPassword = "El campo no puede estar vacio.") }
+        }
         if(fullnameError!=null || userNameError!=null ||
             passwordError!=null || emailError!=null || currentState.errorConfirmPassword!=null){
             onFullnameFocusLost()
