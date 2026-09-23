@@ -16,13 +16,13 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.util.AttributeKey
 import kotlinx.serialization.json.Json
 import javax.inject.Singleton
-
+val SkipAuth = AttributeKey<Boolean>("SkipAuth")
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
-
     @Provides
     @Singleton
     fun provideHttpClient(tokenManager: TokenManager): HttpClient {
@@ -61,7 +61,6 @@ object NetworkModule {
                             }
 
                             if (response.status == HttpStatusCode.OK) {
-                                // Ajusta esto según tu LoginUserResponseDto real
                                 val newTokens = response.body<LoginUserResponseDto>()
                                 tokenManager.saveTokens(
                                     newTokens.accessToken,
@@ -81,8 +80,12 @@ object NetworkModule {
 
                     sendWithoutRequest { request ->
                         val path = request.url.encodedPath
-                        // Excluimos las peticiones que no necesitan token
-                        path.contains("login") || path.contains("refresh") || path.contains("register")
+                        val isPublicRoute = path.contains("login") || path.contains("refresh")
+                        val shouldSkipAuth = request.attributes.contains(SkipAuth)
+
+                        // Retorna FALSE para NO enviar token
+                        // Retorna TRUE para SÍ adjuntar el Bearer Token automáticamente
+                        !(isPublicRoute || shouldSkipAuth)
                     }
                 }
             }
