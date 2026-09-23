@@ -14,6 +14,9 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val tokenManager: TokenManager
 ): ViewModel() {
+    //obtenemos la expiracion del token manager
+    val sessionExpiredEvent = tokenManager.sessionExpiredEvent
+
     // Estado para mostrar una pantalla de carga mientras se leen las preferencias
     private val _isLoading = MutableStateFlow(true)
     val isLoading = _isLoading.asStateFlow()

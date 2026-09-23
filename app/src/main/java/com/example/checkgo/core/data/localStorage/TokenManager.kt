@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -11,6 +13,8 @@ import javax.inject.Singleton
 class TokenManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
+    private val _sessionExpiredEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val sessionExpiredEvent = _sessionExpiredEvent.asSharedFlow()
     private val masterKey = MasterKey.Builder(context)
         .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
         .build()
@@ -35,5 +39,8 @@ class TokenManager @Inject constructor(
     fun getRole(): String? = sharedPreferences.getString("ROLE",null)
     fun clearAll() {
         sharedPreferences.edit().clear().apply()
+    }
+    fun accessTokenExpirado(){
+        _sessionExpiredEvent.tryEmit(Unit)
     }
 }
