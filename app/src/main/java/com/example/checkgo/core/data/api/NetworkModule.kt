@@ -70,10 +70,12 @@ object NetworkModule {
                                 BearerTokens(newTokens.accessToken, newTokens.refreshToken)
                             } else {
                                 tokenManager.clearAll()
+                                tokenManager.accessTokenExpirado()
                                 null
                             }
                         } catch (e: Exception) {
                             tokenManager.clearAll()
+                            tokenManager.accessTokenExpirado()
                             null
                         }
                     }

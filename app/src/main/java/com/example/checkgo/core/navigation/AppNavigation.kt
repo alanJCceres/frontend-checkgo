@@ -9,6 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
@@ -40,10 +41,21 @@ fun AppNavigation(
     val startDestination by mainViewModel.startDestination.collectAsState()
     val navController = rememberNavController()
 
-// Obtenemos la ruta actual para saber dónde está el usuario
+    // Obtenemos la ruta actual para saber dónde está el usuario
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val isImmersiveScreen = currentRoute == "login" //verificamos si la ruta es login
+
+    // Escuchamos el evento de refresh token expirado, si expiro redirigimos al login automaticamente.
+    LaunchedEffect(Unit) {
+        mainViewModel.sessionExpiredEvent.collect {
+            navController.navigate("login") {
+                popUpTo(0) { inclusive = true }
+                launchSingleTop = true
+            }
+        }
+    }
+
     if (isLoading) {
         Box(
             modifier = Modifier.fillMaxSize(),
