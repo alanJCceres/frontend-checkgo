@@ -40,9 +40,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
@@ -55,6 +62,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.checkgo.core.ui.components.CustomTopToast
 import com.example.checkgo.core.ui.theme.DarkTextColorSecundario
+import com.example.checkgo.core.ui.theme.LightTextColorSecundario
+import com.example.checkgo.core.ui.theme.StyleTextBody
 import com.example.checkgo.feature_auth.presentation.viewmodel.LoginUiEvent
 import com.example.checkgo.feature_auth.presentation.viewmodel.LoginViewModel
 import kotlinx.coroutines.delay
@@ -212,30 +221,35 @@ fun LoginScreen(
                     isLoading = uiState.isLoading,
                     onClick = { viewModel.onLoginClicked() }
                 )
-                Spacer(modifier = Modifier.height(5.dp))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("¿Eres admin y no tienes cuenta?",
-                        color = Color.Gray,
-                        fontSize = 13.sp
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text("Crear cuenta",
-                        color = MaterialTheme.colorScheme.primary,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.clickable (
-                            enabled = !uiState.isLoading,
-                        ){
-                            navController.navigate("registerAdmin")
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = buildAnnotatedString {
+                        append("¿Eres admin y no tienes cuenta? ")
+                        withLink(
+                            link = LinkAnnotation.Clickable(
+                                tag = "ACCOUNT_LINK",
+                                styles = TextLinkStyles(
+                                    style = SpanStyle(
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        textDecoration = TextDecoration.None
+                                    )
+                                ),
+                                linkInteractionListener = {
+                                    if (!uiState.isLoading) {
+                                        navController.navigate("registerAdmin")
+                                    }
+                                }
+                            )
+                        ) {
+                            append("Crear cuenta")
                         }
-                    )
-                }
+                    },
+                    fontSize = 13.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign= TextAlign.Center,
+                )
             }
         }
         AnimatedVisibility(
