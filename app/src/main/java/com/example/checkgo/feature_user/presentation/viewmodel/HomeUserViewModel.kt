@@ -64,7 +64,10 @@ class HomeUserViewModel @Inject constructor(
         _showSecuritySheet.value = false
     }
     fun logout(onLogoutComplete: () -> Unit) {
-        tokenManager.clearAll()
-        onLogoutComplete()
+        viewModelScope.launch {
+            tokenManager.clearAll()
+            appDataStoreManager.clearAllData()
+            onLogoutComplete()
+        }
     }
 }

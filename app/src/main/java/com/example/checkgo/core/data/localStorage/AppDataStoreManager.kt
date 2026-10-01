@@ -27,4 +27,14 @@ class AppDataStoreManager @Inject constructor(
             preferences[IS_FIRST_TIME_LOGIN] ?: false
         }.first()
     }
+    suspend fun clearAny() {
+        context.dataStore.edit { preferences ->
+            preferences.remove(IS_FIRST_TIME_LOGIN)
+        }
+    }
+    suspend fun clearAllData() {
+        context.dataStore.edit { preferences ->
+            preferences.clear()
+        }
+    }
 }
