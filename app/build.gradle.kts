@@ -64,7 +64,7 @@ dependencies {
     implementation(libs.androidx.material.icons.extended) // para iconos
     implementation(libs.bundles.ktor.client) // Implementamos todo el bundle de Ktor
     implementation(libs.kotlinx.serialization.json) // Kotlinx Serialization
-    implementation(libs.store5) // Store5
+    implementation(libs.store5) // Store5 tipo tanstack query
     // Para guardar los tokens de forma segura
     implementation(libs.security.crypto)
     // Plugin de autenticación de Ktor
@@ -73,4 +73,6 @@ dependencies {
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.android)
     implementation(libs.hilt.navigation.compose)
+    // Preferences DataStore
+    implementation(libs.androidx.datastore.preferences)
 }

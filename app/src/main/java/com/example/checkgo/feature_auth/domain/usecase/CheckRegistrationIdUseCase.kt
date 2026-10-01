@@ -2,29 +2,22 @@ package com.example.checkgo.feature_auth.domain.usecase
 
 import com.example.checkgo.core.data.dto.ErrorResponseDto
 import com.example.checkgo.core.data.localStorage.AppDataStoreManager
-import com.example.checkgo.core.data.localStorage.TokenManager
-import com.example.checkgo.feature_auth.data.dto.LoginUserRequestDto
-import com.example.checkgo.feature_auth.data.dto.LoginUserResponseDto
 import com.example.checkgo.feature_auth.data.repository.AuthRepository
 import io.ktor.client.call.body
 import javax.inject.Inject
 
-class LoginUserUseCase @Inject constructor(
+class CheckRegistrationIdUseCase @Inject constructor(
     private val repository: AuthRepository,
-    private val tokenManager: TokenManager
+    private val appDataStoreManager: AppDataStoreManager
 ) {
-    suspend operator fun invoke(request: LoginUserRequestDto):Result<String>{
+    suspend operator fun invoke(): Result<Boolean>{
         try{
-            val response = repository.postLoginUser(request)
+            val response = repository.getFirstTimeLogin()
             return when(response.status.value){
                 200->{
-                    val successBody = response.body<LoginUserResponseDto>()
-                    tokenManager.saveTokens(
-                        accessToken = successBody.accessToken,
-                        refreshToken = successBody.refreshToken,
-                        role = successBody.role.toString()
-                    )
-                    Result.success(successBody.role.toString())
+                    val successBody = response.body<Boolean>()
+                    appDataStoreManager.saveNeedsRegistration(successBody)
+                    Result.success(successBody)
                 }
                 400,401,409 -> {
                     val errorBody = response.body<ErrorResponseDto>()

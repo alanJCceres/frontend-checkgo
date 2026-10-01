@@ -1,5 +1,10 @@
 package com.example.checkgo.feature_user.presentation.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,8 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -17,23 +20,34 @@ import androidx.navigation.NavController
 import com.example.checkgo.core.ui.components.CustomButton
 import com.example.checkgo.feature_user.presentation.viewmodel.HomeUserViewModel
 import androidx.compose.runtime.*
+import com.example.checkgo.core.ui.components.CustomTopToast
 import com.example.checkgo.core.ui.components.SecurityBottomSheet
+import com.example.checkgo.feature_user.presentation.viewmodel.HomeUiEvent
+import kotlinx.coroutines.delay
 
 @Composable
 fun HomeUserScreen(
     navController: NavController,
     viewModel: HomeUserViewModel = hiltViewModel()
 ) {
-    var showSecuritySheet by remember { mutableStateOf(false) }
+    val showSecuritySheet by viewModel.showSecuritySheet.collectAsState()
+    var toastMessage by remember { mutableStateOf<String?>(null) }
+    var isErrorToast by remember {mutableStateOf(true)}
 
-    // Simulamos la verificación al cargar la pantalla
+    LaunchedEffect(toastMessage) {
+        if (toastMessage!=null){
+            delay(4000)
+            toastMessage=null
+        }
+    }
     LaunchedEffect(Unit) {
-        // Aquí iría tu lógica de verificación real (ej: viewModel.checkRegistration())
-        // Para este ejemplo, simulamos que detecta que necesita mostrarse.
-        val needsRegistration = true // Cambia esto según tu lógica
-
-        if (needsRegistration) {
-            showSecuritySheet = true
+        viewModel.navigationEvent.collect{ event ->
+            when(event){
+                is HomeUiEvent.ShowErrorToast ->{
+                    isErrorToast=true
+                    toastMessage=event.message
+                }
+            }
         }
     }
     Box(
@@ -61,14 +75,23 @@ fun HomeUserScreen(
                 }
             }
         )
+
+        AnimatedVisibility(
+            visible = toastMessage != null,
+            enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
+            exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut(),
+            modifier = Modifier.align(Alignment.TopCenter)
+        ) {
+            toastMessage?.let { message ->
+                CustomTopToast(message = message, isError = isErrorToast)
+            }
+        }
     }
+
     if (showSecuritySheet) {
         SecurityBottomSheet(
             onDismissRequest = {
-                // Lógica al presionar el botón cerrar o al tocar fuera del sheet
-                showSecuritySheet = false
-                // Aquí podrías avisar a tu ViewModel que el usuario ya leyó el aviso
-                // viewModel.onSecurityInfoDismissed()
+                viewModel.dismissSecuritySheet()
             }
         )
     }
