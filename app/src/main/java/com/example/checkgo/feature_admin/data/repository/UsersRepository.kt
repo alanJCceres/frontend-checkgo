@@ -30,11 +30,11 @@ class UsersRepository @Inject constructor(
     ).build()
 
     fun getUsers(forceRefresh: Boolean = false): Flow<StoreReadResponse<List<UserResponseDto>>> {
-        return usersStore.stream(
-            StoreReadRequest.cached(
-                key = Unit,
-                refresh = forceRefresh
-            )
-        )
+        val request = if (forceRefresh) {
+            StoreReadRequest.fresh(key = Unit) // Obliga a ir a la red y actualiza la caché
+        } else {
+            StoreReadRequest.cached(key = Unit, refresh = false) // Usa la caché en memoria
+        }
+        return usersStore.stream(request)
     }
 }

@@ -14,6 +14,8 @@ import org.mobilenativefoundation.store.store5.StoreReadResponse
 import javax.inject.Inject
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
+import com.example.checkgo.core.bus.UserEvent
+import com.example.checkgo.core.bus.UserEventBus
 
 sealed class UserUiState {
     object Loading : UserUiState()
@@ -23,7 +25,8 @@ sealed class UserUiState {
 }
 @HiltViewModel
 class UsersViewModel @Inject constructor(
-    private val usersUseCase: UsersUseCase
+    private val usersUseCase: UsersUseCase,
+    private val eventBus: UserEventBus
 ): ViewModel() {
     private val _uiState = MutableStateFlow<UserUiState>(UserUiState.Loading)
     val uiState: StateFlow<UserUiState> = _uiState.asStateFlow()
@@ -33,6 +36,16 @@ class UsersViewModel @Inject constructor(
 
     init {
         cargarUsuarios()
+
+        viewModelScope.launch {
+            eventBus.events.collect { event ->
+                when (event) {
+                    is UserEvent.UserCreated -> {
+                        cargarUsuarios(forceRefresh = true)
+                    }
+                }
+            }
+        }
     }
     fun cargarUsuarios(forceRefresh: Boolean = false) {
         viewModelScope.launch {
