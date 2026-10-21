@@ -1,5 +1,10 @@
 package com.example.checkgo.feature_admin.presentation.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,6 +38,8 @@ import com.example.checkgo.feature_admin.presentation.viewmodel.UsersViewModel
 import androidx.compose.runtime.getValue
 import com.example.checkgo.feature_admin.presentation.viewmodel.UserUiState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.LaunchedEffect
+import com.example.checkgo.core.ui.components.CustomTopToast
 import com.example.checkgo.core.ui.components.EmptyStateView
 
 @Composable
@@ -42,6 +49,14 @@ fun UsersScreen(
 ) {
     val state by viewModel.uiState.collectAsState()
     val modoOscuro = isSystemInDarkTheme()
+    val toastMessage = viewModel.toastMessage
+
+    LaunchedEffect(toastMessage) {
+        if (toastMessage != null) {
+            kotlinx.coroutines.delay(4000)
+            viewModel.dismissToast()
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -84,7 +99,7 @@ fun UsersScreen(
             ) {
                 when (val currentState = state) {
                     is UserUiState.Loading -> {
-                        CircularProgressIndicator()
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
                     }
                     is UserUiState.Empty -> {
                         EmptyStateView(
@@ -92,8 +107,11 @@ fun UsersScreen(
                             description = "Actualmente no hay usuarios registrados."
                         )
                     }
-                    is UserUiState.ShowErrorToast ->{
-
+                    is UserUiState.ErrorScreen -> {
+                        EmptyStateView(
+                            title = "Error inesperado",
+                            description = "Ocurrio un error inesperado al cargar los usuarios, posible causa: ${currentState.message}."
+                        )
                     }
                     is UserUiState.Success -> {
                         LazyColumn(
@@ -114,6 +132,16 @@ fun UsersScreen(
                 }
             }
             Spacer(modifier = Modifier.height(15.dp))
+        }
+        AnimatedVisibility(
+            visible = toastMessage != null,
+            enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
+            exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut(),
+            modifier = Modifier.align(Alignment.TopCenter)
+        ) {
+            toastMessage?.let { message ->
+                CustomTopToast(message = message, isError = true)
+            }
         }
     }
 }

@@ -40,14 +40,5 @@ class AuthRepository @Inject constructor(
     suspend fun getFirstTimeLogin(): HttpResponse{
         return client.get("${endpointBase}/first_time_login")
     }
-    // Para GET: Devuelve el DTO ya parseado
-//    suspend fun getUser(userId: String): UserResponseDto {
-//        val response = ApiHttp.get("users/$userId")
-//        if (response.status.value in 200..299) {
-//            return response.body<UserResponseDto>()
-//        } else {
-//            throw Exception("Error del servidor: ${response.status.value}")
-//        }
-//    }
 
 }

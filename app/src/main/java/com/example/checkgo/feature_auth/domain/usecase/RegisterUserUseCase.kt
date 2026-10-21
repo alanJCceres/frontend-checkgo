@@ -29,14 +29,3 @@ class RegisterUserUseCase @Inject constructor(
         }
     }
 }
-
-// 1. GET (Con Store5 para caché y reactividad)
-//class GetUserUseCase {
-//    private val store = StoreProviders.userProfileStore
-//
-//    operator fun invoke(userId: String, forceRefresh: Boolean = false): Flow<StoreReadResponse<User>> {
-//        return store.stream(
-//            StoreRequest.cached(key = userId, refresh = forceRefresh)
-//        )
-//    }
-//}
