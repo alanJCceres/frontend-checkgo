@@ -39,19 +39,25 @@ val CheckGoTypography = Typography(
     labelMedium = defaultTypography.labelMedium.copy(fontFamily = GoogleSansFlex),
     labelSmall = defaultTypography.labelSmall.copy(fontFamily = GoogleSansFlex)
 )
-
-val StyleTextSubHeader = TextStyle(
+val StyleTextTituloHeader = TextStyle( //estilo para titulo de screen
+    fontWeight = FontWeight.Bold,
+    fontSize = 32.sp,
+)
+val StyleTextSubHeader = TextStyle( //estilo para sub header
     fontWeight = FontWeight.Medium,
     fontSize = 14.sp,
+    lineHeight = 23.sp
 )
-val StyleTextTituloHeader = TextStyle(
+val StyleTextTituloBody = TextStyle( //estilo para titulo del body
     fontWeight = FontWeight.Bold,
-    fontSize = 32.sp
+    fontSize = 24.sp,
+    lineHeight = 26.sp
 )
-val StyleTextBody = TextStyle(
-    fontSize = 16.sp
+val StyleTextBody = TextStyle( //estilo para text normal
+    fontSize = 15.sp,
+    lineHeight = 23.sp
 )
-val StyleTextLabelInput = TextStyle(
+val StyleTextLabelInput = TextStyle( //estilo para label
     fontWeight = FontWeight.SemiBold,
     fontSize = 14.sp,
 )

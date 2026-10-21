@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.checkgo.core.data.enum.UserRole
 import com.example.checkgo.feature_auth.data.dto.LoginUserRequestDto
+import com.example.checkgo.feature_auth.domain.usecase.CheckRegistrationIdUseCase
 import com.example.checkgo.feature_auth.domain.usecase.LoginUserUseCase
 import com.example.checkgo.feature_auth.domain.validators.PasswordValidator
 import com.example.checkgo.feature_auth.domain.validators.UserNameValidator
@@ -32,7 +33,8 @@ sealed class LoginUiEvent{
 }
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginUserUseCase: LoginUserUseCase
+    private val loginUserUseCase: LoginUserUseCase,
+    private val checkRegistrationIdUseCase: CheckRegistrationIdUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
@@ -79,22 +81,33 @@ class LoginViewModel @Inject constructor(
             viewModelScope.launch {
                 loginUserUseCase(login).fold(
                     onSuccess = { role ->
-                        _uiState.update { it.copy(isLoading = false) }
-                        val role = runCatching {
-                            UserRole.valueOf(role)
-                        }.getOrNull()
 
-                        when (role) {
-                            UserRole.SUPER_ADMIN -> {
-                                _navigationEvent.send(LoginUiEvent.Navigate("homeAdmin"))
+                        checkRegistrationIdUseCase().fold(
+
+                            onSuccess = {
+                                _uiState.update { it.copy(isLoading = false) }
+                                val role = runCatching {
+                                    UserRole.valueOf(role)
+                                }.getOrNull()
+
+                                when (role) {
+                                    UserRole.SUPER_ADMIN -> {
+                                        _navigationEvent.send(LoginUiEvent.Navigate("homeAdmin"))
+                                    }
+                                    UserRole.USER -> {
+                                        _navigationEvent.send(LoginUiEvent.Navigate("homeUser"))
+                                    }
+                                    else -> {
+                                        _navigationEvent.send(LoginUiEvent.ShowErrorToast("Error al obtener el rol, porfavor cierre la app y vuelva a ingresar."))
+                                    }
+                                }
+                            },
+                            onFailure = {exception ->
+                                _uiState.update { it.copy(isLoading = false) }
+                                val errorMessage = exception.message?:"Error desconocido"
+                                _navigationEvent.send(LoginUiEvent.ShowErrorToast(errorMessage))
                             }
-                            UserRole.USER -> {
-                                _navigationEvent.send(LoginUiEvent.Navigate("homeUser"))
-                            }
-                            else -> {
-                                _navigationEvent.send(LoginUiEvent.ShowErrorToast("Error al obtener el rol, porfavor cierre la app y vuelva a ingresar."))
-                            }
-                        }
+                        )
                     },
                     onFailure = {exception ->
                         _uiState.update { it.copy(isLoading = false) }

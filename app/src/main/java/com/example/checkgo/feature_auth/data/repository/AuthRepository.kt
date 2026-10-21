@@ -6,6 +6,7 @@ import com.example.checkgo.feature_auth.data.dto.LoginUserRequestDto
 import com.example.checkgo.feature_auth.data.dto.RegisterUserRequestDto
 import com.example.checkgo.feature_auth.presentation.viewmodel.LoginUiEvent
 import io.ktor.client.HttpClient
+import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -36,14 +37,8 @@ class AuthRepository @Inject constructor(
             setBody(request)
         }
     }
-    // Para GET: Devuelve el DTO ya parseado
-//    suspend fun getUser(userId: String): UserResponseDto {
-//        val response = ApiHttp.get("users/$userId")
-//        if (response.status.value in 200..299) {
-//            return response.body<UserResponseDto>()
-//        } else {
-//            throw Exception("Error del servidor: ${response.status.value}")
-//        }
-//    }
+    suspend fun getFirstTimeLogin(): HttpResponse{
+        return client.get("${endpointBase}/first_time_login")
+    }
 
 }

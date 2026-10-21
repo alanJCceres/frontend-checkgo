@@ -1,6 +1,7 @@
 package com.example.checkgo.feature_auth.domain.usecase
 
 import com.example.checkgo.core.data.dto.ErrorResponseDto
+import com.example.checkgo.core.data.localStorage.AppDataStoreManager
 import com.example.checkgo.core.data.localStorage.TokenManager
 import com.example.checkgo.feature_auth.data.dto.LoginUserRequestDto
 import com.example.checkgo.feature_auth.data.dto.LoginUserResponseDto

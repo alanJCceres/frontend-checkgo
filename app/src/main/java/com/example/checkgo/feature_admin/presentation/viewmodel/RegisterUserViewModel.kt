@@ -2,6 +2,7 @@ package com.example.checkgo.feature_admin.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.checkgo.core.bus.UserEventBus
 import com.example.checkgo.core.data.enum.UserRole
 import com.example.checkgo.feature_auth.data.dto.RegisterUserRequestDto
 import com.example.checkgo.feature_auth.domain.usecase.RegisterUserUseCase
@@ -38,7 +39,8 @@ sealed class RegisterUserUiEvent{
 }
 @HiltViewModel
 class RegisterUserViewModel @Inject constructor(
-    private val registerUserUseCase: RegisterUserUseCase
+    private val registerUserUseCase: RegisterUserUseCase,
+    private val eventBus: UserEventBus
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(RegisterUserUiState())
     val uiState: StateFlow<RegisterUserUiState> = _uiState.asStateFlow()
@@ -121,6 +123,7 @@ class RegisterUserViewModel @Inject constructor(
                         _uiState.update { it.copy(isLoading = false) }
                         _navigationEvent.send(RegisterUserUiEvent.ShowSuccessToast(message))
                         _uiState.update { RegisterUserUiState() }
+                        eventBus.notifyUserCreated()
                     },
                     onFailure = {exception ->
                         _uiState.update { it.copy(isLoading = false) }

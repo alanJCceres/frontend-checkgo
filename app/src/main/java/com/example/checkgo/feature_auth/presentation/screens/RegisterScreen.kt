@@ -5,19 +5,16 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -34,12 +31,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.checkgo.core.ui.components.CustomButton
 import com.example.checkgo.core.ui.components.CustomTextFieldClasic
@@ -92,13 +94,13 @@ fun RegisterScreen(
         modifier = Modifier
             .systemBarsPadding()
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
     ){
         //INICIO DE FORM
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(20.dp,30.dp),
+                .verticalScroll(rememberScrollState())
+                .padding(20.dp,0.dp),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -124,6 +126,7 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(25.dp))
             Column(
+                modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -204,29 +207,35 @@ fun RegisterScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 //PIE DE PAGINA Sing in
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("¿Ya tienes una cuenta?",
-                        color = Color.Gray,
-                        fontSize = 13.sp
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text("Iniciar sesión",
-                        color = MaterialTheme.colorScheme.primary,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.clickable (
-                            enabled = !uiState.isLoading,
-                        ){
-                            navController.navigate("login")
+                Text(
+                    text = buildAnnotatedString {
+                        append("¿Ya tienes una cuenta? ")
+                        withLink(
+                            link = LinkAnnotation.Clickable(
+                                tag = "ACCOUNT_LINK",
+                                styles = TextLinkStyles(
+                                    style = SpanStyle(
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        textDecoration = TextDecoration.None
+                                    )
+                                ),
+                                linkInteractionListener = {
+                                    if (!uiState.isLoading) {
+                                        navController.navigate("login")
+                                    }
+                                }
+                            )
+                        ) {
+                            append("Iniciar sesión")
                         }
-                    )
-                }
+                    },
+                    fontSize = 13.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign= TextAlign.Center,
+                )
+                Spacer(modifier = Modifier.height(16.dp))
             }
         }
         //ANIMACION DE TOAST
