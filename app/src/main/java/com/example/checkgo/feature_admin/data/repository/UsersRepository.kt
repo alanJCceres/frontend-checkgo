@@ -2,9 +2,15 @@ package com.example.checkgo.feature_admin.data.repository
 
 import com.example.checkgo.core.data.dto.ErrorResponseDto
 import com.example.checkgo.core.data.dto.UserResponseDto
+import com.example.checkgo.feature_admin.data.dto.UserPatchRequestDto
+import com.example.checkgo.feature_auth.data.dto.LoginUserRequestDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
+import io.ktor.client.request.patch
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.flow.Flow
 import org.mobilenativefoundation.store.store5.Fetcher
 import org.mobilenativefoundation.store.store5.Store
@@ -36,5 +42,10 @@ class UsersRepository @Inject constructor(
             StoreReadRequest.cached(key = Unit, refresh = false) // Usa la caché en memoria
         }
         return usersStore.stream(request)
+    }
+    suspend fun patchEditUser(idUser: String, request: UserPatchRequestDto):HttpResponse{
+        return client.patch("${endpointBase}/users/${idUser}/credentials") {
+            setBody(request)
+        }
     }
 }

@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.checkgo.core.ui.components.AppBottomBar
+import com.example.checkgo.feature_admin.presentation.screens.EditUserScreen
 import com.example.checkgo.feature_admin.presentation.screens.UsersScreen
 import com.example.checkgo.feature_user.presentation.screens.ReportsUserScreen
 
@@ -116,6 +117,7 @@ fun AppNavigation(
                 composable("homeAdmin"){ HomeAdminScreen(navController=navController) }
                 composable("registerUser"){ RegisterUserScreen() }
                 composable("listUsers"){ UsersScreen(navController=navController) }
+                composable("editUser"){ EditUserScreen() }
 
                 // --- Pantallas USER ---
                 composable("homeUser"){ HomeUserScreen(navController=navController) }

@@ -46,7 +46,8 @@ import com.example.checkgo.core.ui.theme.StyleTextTituloBody
 @Composable
 fun InfoUserBottomSheet(
     user: UserResponseDto,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
+    onEditClick: () -> Unit
 ) {
     val modoOscuro = isSystemInDarkTheme()
     val circleBackground = Color(0xFFEEEEEE)
@@ -168,7 +169,7 @@ fun InfoUserBottomSheet(
             //BOTON PARA EDITAR
             CustomButton(
                 text="Editar información",
-                onClick = { onDismissRequest() }
+                onClick = { onEditClick() }
             )
             Spacer(modifier = Modifier.height(26.dp))
         }

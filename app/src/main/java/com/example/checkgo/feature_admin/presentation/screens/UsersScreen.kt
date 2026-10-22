@@ -152,7 +152,10 @@ fun UsersScreen(
     selectedUser?.let { user ->
         InfoUserBottomSheet(
             user = user,
-            onDismissRequest = { viewModel.dismissInfoUser() }
+            onDismissRequest = { viewModel.dismissInfoUser() },
+            onEditClick = {
+                navController.navigate("editUser")
+            }
         )
     }
 }
