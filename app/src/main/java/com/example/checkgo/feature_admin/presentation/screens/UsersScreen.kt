@@ -39,8 +39,10 @@ import androidx.compose.runtime.getValue
 import com.example.checkgo.feature_admin.presentation.viewmodel.UserUiState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.LaunchedEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.checkgo.core.ui.components.CustomTopToast
 import com.example.checkgo.core.ui.components.EmptyStateView
+import com.example.checkgo.core.ui.components.InfoUserBottomSheet
 
 @Composable
 fun UsersScreen(
@@ -48,6 +50,7 @@ fun UsersScreen(
     viewModel: UsersViewModel= hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
+    val selectedUser by viewModel.selectedUser.collectAsStateWithLifecycle()
     val modoOscuro = isSystemInDarkTheme()
     val toastMessage = viewModel.toastMessage
 
@@ -108,6 +111,7 @@ fun UsersScreen(
                         )
                     }
                     is UserUiState.ErrorScreen -> {
+
                         EmptyStateView(
                             title = "Error inesperado",
                             description = "Ocurrio un error inesperado al cargar los usuarios, posible causa: ${currentState.message}."
@@ -123,7 +127,7 @@ fun UsersScreen(
                             items(currentState.users) { user ->
                                 CardUser(
                                     user = user,
-                                    onOpenInfo = {}
+                                    onOpenInfo = {viewModel.onShowInfoUser(user)}
                                 )
                                 Spacer(modifier = Modifier.height(15.dp))
                             }
@@ -143,5 +147,12 @@ fun UsersScreen(
                 CustomTopToast(message = message, isError = true)
             }
         }
+    }
+
+    selectedUser?.let { user ->
+        InfoUserBottomSheet(
+            user = user,
+            onDismissRequest = { viewModel.dismissInfoUser() }
+        )
     }
 }
