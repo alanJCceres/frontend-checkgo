@@ -17,8 +17,12 @@ import org.mobilenativefoundation.store.store5.Store
 import org.mobilenativefoundation.store.store5.StoreBuilder
 import org.mobilenativefoundation.store.store5.StoreReadRequest
 import org.mobilenativefoundation.store.store5.StoreReadResponse
+import org.mobilenativefoundation.store.store5.impl.extensions.get
+import java.util.concurrent.CancellationException
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class UsersRepository @Inject constructor(
     private val client: HttpClient
 ) {
@@ -43,8 +47,35 @@ class UsersRepository @Inject constructor(
         }
         return usersStore.stream(request)
     }
-    suspend fun patchEditUser(idUser: String, request: UserPatchRequestDto):HttpResponse{
-        return client.patch("${endpointBase}/users/${idUser}/credentials") {
+
+    suspend fun getUserById(userPublicId: String): UserResponseDto?{
+        val cached = try {
+            usersStore.get(Unit)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            emptyList()
+        }
+        cached.firstOrNull { it.publicId == userPublicId }?.let { return it } //si existe el objeto devuelve aqui
+
+        //si falla lo primero intenta obtenerlo de la red
+        return try {
+            val response = client.get("$endpointBase/user/$userPublicId")
+            if (response.status.value == 200) {
+                response.body<UserResponseDto>()
+            } else {
+                null
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            null
+        }
+
+    }
+
+    suspend fun patchEditUser(userPublicId: String, request: UserPatchRequestDto):HttpResponse{
+        return client.patch("${endpointBase}/users/${userPublicId}/credentials") {
             setBody(request)
         }
     }

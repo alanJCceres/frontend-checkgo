@@ -6,7 +6,9 @@ import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class SharedRepository @Inject constructor(
     private val client: HttpClient
 ) {

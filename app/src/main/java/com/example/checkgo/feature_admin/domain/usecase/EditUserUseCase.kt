@@ -10,14 +10,14 @@ import javax.inject.Inject
 class EditUserUseCase @Inject constructor(
     private val repository: UsersRepository
 ) {
-    suspend operator fun invoke(idUser:String,request: UserPatchRequestDto):Result<String>{
+    suspend operator fun invoke(userPublicId:String,request: UserPatchRequestDto):Result<String>{
         try{
-            val response = repository.patchEditUser(idUser,request)
+            val response = repository.patchEditUser(userPublicId,request)
             return when(response.status.value){
-                201,200->{
+                204->{
                     Result.success("usuario actualizado correctamente.")
                 }
-                400 -> Result.failure(Exception("datos inválidos, por favor cierre la app y vuelva a ingresar"))
+                400 -> Result.failure(Exception("datos inválidos, por favor verifique los datos enviados y vuelva a intentar"))
                 409 -> {
                     val errorBody = response.body<ErrorResponseDto>()
                     Result.failure(Exception(errorBody.message))

@@ -117,7 +117,9 @@ fun AppNavigation(
                 composable("homeAdmin"){ HomeAdminScreen(navController=navController) }
                 composable("registerUser"){ RegisterUserScreen() }
                 composable("listUsers"){ UsersScreen(navController=navController) }
-                composable("editUser"){ EditUserScreen() }
+                composable("editUser/{userId}",
+                    arguments = listOf(navArgument("userId") { type = NavType.StringType })
+                    ){ EditUserScreen() }
 
                 // --- Pantallas USER ---
                 composable("homeUser"){ HomeUserScreen(navController=navController) }

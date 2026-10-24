@@ -12,13 +12,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -28,19 +24,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.checkgo.core.data.dto.UserResponseDto
 import com.example.checkgo.core.ui.theme.DarkTextColorSecundario
 import com.example.checkgo.core.ui.theme.LightTextColorSecundario
-import com.example.checkgo.core.ui.theme.StyleTextBody
-import com.example.checkgo.core.ui.theme.StyleTextSubHeader
 import com.example.checkgo.core.ui.theme.StyleTextTituloBody
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,6 +44,7 @@ fun InfoUserBottomSheet(
 ) {
     val modoOscuro = isSystemInDarkTheme()
     val circleBackground = Color(0xFFEEEEEE)
+    val scope = rememberCoroutineScope()
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val badgeColors = if (user.active) BadgeDefaults.Green else BadgeDefaults.Gray
@@ -169,7 +163,14 @@ fun InfoUserBottomSheet(
             //BOTON PARA EDITAR
             CustomButton(
                 text="Editar información",
-                onClick = { onEditClick() }
+                onClick = {
+                    scope.launch { sheetState.hide() }
+                        .invokeOnCompletion {
+                            // se ejecuta cuando la animación de cierre terminó
+                            onDismissRequest()   // limpia el estado en el ViewModel
+                            onEditClick()        // navega
+                        }
+                }
             )
             Spacer(modifier = Modifier.height(26.dp))
         }

@@ -37,7 +37,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.example.checkgo.core.ui.components.CustomButton
 import com.example.checkgo.core.ui.components.CustomTextFieldClasic
 import com.example.checkgo.core.ui.components.CustomTopToast
@@ -135,7 +134,7 @@ fun EditUserScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
                 CustomTextFieldClasic(
-                    value=uiState.password,
+                    value=uiState.password?:"",
                     onValueChange = {viewModel.onPasswordChange(it)},
                     onBlur = {viewModel.onPasswordFocusLost()},
                     label = "Contraseña *",
@@ -172,6 +171,7 @@ fun EditUserScreen(
                     text="Modificar usuario",
                     loadingText = "Cargando...",
                     isLoading = uiState.isLoading,
+                    enabled = uiState.buttonEnabled,
                     onClick = { viewModel.onUpdateClicked() }
                 )
             }

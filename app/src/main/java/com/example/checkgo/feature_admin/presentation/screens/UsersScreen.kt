@@ -154,7 +154,7 @@ fun UsersScreen(
             user = user,
             onDismissRequest = { viewModel.dismissInfoUser() },
             onEditClick = {
-                navController.navigate("editUser")
+                navController.navigate("editUser/${user.publicId}")
             }
         )
     }

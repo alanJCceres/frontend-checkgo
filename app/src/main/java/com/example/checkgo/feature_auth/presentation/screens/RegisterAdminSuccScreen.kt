@@ -144,6 +144,7 @@ fun RegisterAdminSuccScreen(
                 text="Continuar",
                 loadingText = "Cargando...",
                 isLoading = uiState.isLoading,
+                enabled = !uiState.isLoading,
                 onClick = { viewModel.onContinueClicked() }
             )
         }

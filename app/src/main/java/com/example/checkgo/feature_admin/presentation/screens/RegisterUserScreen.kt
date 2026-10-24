@@ -182,6 +182,7 @@ fun RegisterUserScreen(
                     text="Agregar usuario",
                     loadingText = "Cargando...",
                     isLoading = uiState.isLoading,
+                    enabled = !uiState.isLoading,
                     onClick = { viewModel.onRegisterClicked() }
                 )
             }

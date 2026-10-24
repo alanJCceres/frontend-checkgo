@@ -1,12 +1,14 @@
 package com.example.checkgo.feature_admin.presentation.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.checkgo.core.bus.UserEventBus
 import com.example.checkgo.feature_admin.data.dto.UserPatchRequestDto
 import com.example.checkgo.feature_admin.domain.usecase.EditUserUseCase
-import com.example.checkgo.feature_auth.domain.validators.PasswordValidator
-import com.example.checkgo.feature_auth.domain.validators.UserNameValidator
+import com.example.checkgo.feature_admin.domain.usecase.UserUseCase
+import com.example.checkgo.core.common.UserNameValidator
+import com.example.checkgo.feature_admin.domain.validators.NewPasswordValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +21,7 @@ import javax.inject.Inject
 
 data class EditUserUiState(
     val userName: String="",
-    val password: String="",
+    val password: String?=null,
     val confirmPassword: String="",
     val isPasswordVisible: Boolean=false,
     val isConfirmPasswordVisible: Boolean=false,
@@ -28,6 +30,7 @@ data class EditUserUiState(
     val errorPassword: String? = null,
     val errorConfirmPassword: String? = null,
     val isLoading: Boolean=false,
+    val buttonEnabled: Boolean=false
 )
 sealed class EditUserUiEvent{
     data class ShowSuccessToast(val message: String): EditUserUiEvent()
@@ -37,13 +40,33 @@ sealed class EditUserUiEvent{
 @HiltViewModel
 class EditUserViewModel @Inject constructor(
     private val editUserUseCase: EditUserUseCase,
-    private val eventBus: UserEventBus
+    private val userUseCase: UserUseCase,
+    private val eventBus: UserEventBus,
+    savedStateHandle: SavedStateHandle
 ): ViewModel() {
+    private val userPublicId: String = checkNotNull(savedStateHandle["userId"])
+    private var copyUserName:String? = null
     private val _uiState = MutableStateFlow(EditUserUiState())
     val uiState: StateFlow<EditUserUiState> = _uiState.asStateFlow()
     private val _navigationEvent = Channel<EditUserUiEvent>()
     val navigationEvent = _navigationEvent.receiveAsFlow()
 
+    init {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            val user = userUseCase(userPublicId)
+            if (user != null) {
+                _uiState.update { it.copy(userName = user.userName) }
+                copyUserName = user.userName
+                _uiState.update { it.copy(isLoading = false) }
+                _uiState.update { it.copy(buttonEnabled = true) }
+            }else{
+                _navigationEvent.send(EditUserUiEvent.ShowErrorToast("Error al cargar el usuario"))
+                _uiState.update { it.copy(isLoading = false) }
+                _uiState.update { it.copy(buttonEnabled = false) }
+            }
+        }
+    }
     fun onUserNameChange(newUserName:String){
         _uiState.update { estadoActual ->
             estadoActual.copy(
@@ -64,7 +87,7 @@ class EditUserViewModel @Inject constructor(
         _uiState.update { estadoActual ->
             val coincidenPassword = estadoActual.password == newConfirmPassword
             val error =when{
-                newConfirmPassword.isEmpty() -> null
+                newConfirmPassword.isEmpty() -> "Verifique la nueva contraseña."
                 coincidenPassword -> null
                 !coincidenPassword -> "Las contraseñas no coinciden."
                 else -> null
@@ -85,30 +108,36 @@ class EditUserViewModel @Inject constructor(
     }
     fun onPasswordFocusLost(){
         val estadoActual = _uiState.value
-        val validationError = PasswordValidator.validate(estadoActual.password)
-        _uiState.update { it.copy(
-            errorPassword = validationError
-        ) }
+        if(estadoActual.password != null){
+            val validationError = NewPasswordValidator.validate(estadoActual.password)
+            _uiState.update { it.copy(
+                errorPassword = validationError
+            ) }
+        }
+
     }
 
     fun onUpdateClicked() {
         val currentState = _uiState.value
-        if(!inputsInvalidos()){
+        if(!inputsInvalidos() && (currentState.password != null || (currentState.userName != copyUserName))){
             _uiState.update { it.copy(isLoading = true) }
-            val userToSave = UserPatchRequestDto(
-                user = currentState.userName,
+            _uiState.update { it.copy(buttonEnabled = false) }
+            val userToEdit = UserPatchRequestDto(
+                userName = if(currentState.userName != copyUserName)currentState.userName else null,
                 password = currentState.password
             )
             viewModelScope.launch {
-                editUserUseCase("123344",userToSave).fold(
+                editUserUseCase(userPublicId,userToEdit).fold(
                     onSuccess = { message ->
                         _uiState.update { it.copy(isLoading = false) }
+                        _uiState.update { it.copy(buttonEnabled = true) }
+                        copyUserName = currentState.userName
                         _navigationEvent.send(EditUserUiEvent.ShowSuccessToast(message))
-                        _uiState.update { EditUserUiState() }
                         eventBus.notifyUserCreated()
                     },
                     onFailure = {exception ->
                         _uiState.update { it.copy(isLoading = false) }
+                        _uiState.update { it.copy(buttonEnabled = true) }
                         val errorMessage = exception.message?:"Error desconocido"
                         _navigationEvent.send(EditUserUiEvent.ShowErrorToast(errorMessage))
                     }
@@ -121,8 +150,12 @@ class EditUserViewModel @Inject constructor(
         var res: Boolean=false
         val currentState = _uiState.value
         val userNameError = UserNameValidator.validate(currentState.userName)
-        val passwordError = PasswordValidator.validate(currentState.password)
-        if(userNameError!=null || passwordError!=null || currentState.errorConfirmPassword!=null){
+        var passwordError:String? = null
+        if(currentState.password != null){
+            passwordError = NewPasswordValidator.validate(currentState.password)
+            onConfirmPasswordChange(currentState.confirmPassword)
+        }
+        if(userNameError!=null || passwordError!=null || _uiState.value.errorConfirmPassword!=null){
             res=true
         }
         return res

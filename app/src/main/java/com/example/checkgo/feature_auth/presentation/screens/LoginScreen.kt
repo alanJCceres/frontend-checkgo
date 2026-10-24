@@ -219,6 +219,7 @@ fun LoginScreen(
                     text="Iniciar sesión",
                     loadingText = "Cargando...",
                     isLoading = uiState.isLoading,
+                    enabled = !uiState.isLoading,
                     onClick = { viewModel.onLoginClicked() }
                 )
                 Spacer(modifier = Modifier.height(10.dp))
