@@ -96,6 +96,8 @@ object NetworkModule {
             }
         }
     }
+
+    //para limpiar correctamente los tokens
     @Provides @IntoSet @Singleton
     fun provideClientAuthClearable(client: HttpClient): SessionClearable =
         object : SessionClearable {

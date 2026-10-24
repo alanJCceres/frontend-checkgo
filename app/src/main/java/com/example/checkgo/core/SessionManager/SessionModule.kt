@@ -10,6 +10,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 
+//clase donde definimos la implementacion de sessionClearable para limpiar correctamente la sesion
 @Module
 @InstallIn(SingletonComponent::class)
 class SessionModule {
