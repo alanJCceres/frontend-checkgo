@@ -1,14 +1,13 @@
 package com.example.checkgo.feature_admin.data.repository
 
+import com.example.checkgo.core.SessionManager.SessionClearable
 import com.example.checkgo.core.data.dto.ErrorResponseDto
 import com.example.checkgo.core.data.dto.UserResponseDto
 import com.example.checkgo.feature_admin.data.dto.UserPatchRequestDto
-import com.example.checkgo.feature_auth.data.dto.LoginUserRequestDto
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.patch
-import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import kotlinx.coroutines.flow.Flow
@@ -25,7 +24,7 @@ import javax.inject.Singleton
 @Singleton
 class UsersRepository @Inject constructor(
     private val client: HttpClient
-) {
+) : SessionClearable{
     private val endpointBase:String = "api/v1/super_admin"
 
     private val usersStore: Store<Any, List<UserResponseDto>> = StoreBuilder.from(
@@ -78,5 +77,8 @@ class UsersRepository @Inject constructor(
         return client.patch("${endpointBase}/users/${userPublicId}/credentials") {
             setBody(request)
         }
+    }
+    override suspend fun clear() {
+        usersStore.clear()
     }
 }

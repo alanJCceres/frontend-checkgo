@@ -1,11 +1,13 @@
 package com.example.checkgo.core.data.api
 
+import com.example.checkgo.core.SessionManager.SessionClearable
 import com.example.checkgo.core.data.localStorage.TokenManager
 import com.example.checkgo.feature_auth.data.dto.LoginUserResponseDto
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.IntoSet
 import io.ktor.client.*
 import io.ktor.client.call.body
 import io.ktor.client.engine.android.*
@@ -13,6 +15,7 @@ import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.plugin
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
@@ -69,12 +72,12 @@ object NetworkModule {
                                 )
                                 BearerTokens(newTokens.accessToken, newTokens.refreshToken)
                             } else {
-                                tokenManager.clearAll()
+                                tokenManager.clear()
                                 tokenManager.accessTokenExpirado()
                                 null
                             }
                         } catch (e: Exception) {
-                            tokenManager.clearAll()
+                            tokenManager.clear()
                             tokenManager.accessTokenExpirado()
                             null
                         }
@@ -93,4 +96,14 @@ object NetworkModule {
             }
         }
     }
+    @Provides @IntoSet @Singleton
+    fun provideClientAuthClearable(client: HttpClient): SessionClearable =
+        object : SessionClearable {
+            override suspend fun clear() {
+                client.plugin(Auth).providers
+                    .filterIsInstance<BearerAuthProvider>()
+                    .forEach { it.clearToken() }
+            }
+
+        }
 }

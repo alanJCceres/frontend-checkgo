@@ -2,6 +2,7 @@ package com.example.checkgo.feature_user.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.checkgo.core.SessionManager.SessionManager
 import com.example.checkgo.core.common.DeviceInfoProvider
 import com.example.checkgo.core.data.dto.DeviceRequestDto
 import com.example.checkgo.core.data.localStorage.AppDataStoreManager
@@ -23,7 +24,7 @@ sealed class HomeUiEvent{
 }
 @HiltViewModel
 class HomeUserViewModel @Inject constructor(
-    private val tokenManager: TokenManager,
+    private val sessionManager: SessionManager,
     private val appDataStoreManager: AppDataStoreManager,
     private val registerDeviceUseCase: RegisterDeviceUseCase,
     private val deviceInfoProvider: DeviceInfoProvider
@@ -65,8 +66,7 @@ class HomeUserViewModel @Inject constructor(
     }
     fun logout(onLogoutComplete: () -> Unit) {
         viewModelScope.launch {
-            tokenManager.clearAll()
-            appDataStoreManager.clearAllData()
+            sessionManager.clearSession()
             onLogoutComplete()
         }
     }
