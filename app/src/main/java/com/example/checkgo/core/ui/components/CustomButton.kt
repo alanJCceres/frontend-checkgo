@@ -31,7 +31,8 @@ fun CustomButton(
     isLoading: Boolean = false,
     leftIcon: ImageVector? = null,
     rightIcon: ImageVector? = null,
-    isPrimary: Boolean = true
+    isPrimary: Boolean = true,
+    enabled: Boolean = true
 ) {
     // Colores base
     val containerColor = if (isPrimary) MaterialTheme.colorScheme.secondary else Color.Transparent
@@ -58,7 +59,7 @@ fun CustomButton(
             .fillMaxWidth()
             .height(50.dp),
         shape = RoundedCornerShape(20.dp),
-        enabled = !isLoading,
+        enabled = enabled,
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
             contentColor = contentColor,
@@ -67,7 +68,7 @@ fun CustomButton(
         ),
         border = border,
         elevation = elevation,
-        contentPadding = PaddingValues(horizontal = 16.dp)
+        contentPadding = PaddingValues(horizontal = 16.dp),
     ) {
         if (isLoading) {
             // --- ESTADO CARGANDO ---

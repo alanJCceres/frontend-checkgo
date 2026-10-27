@@ -6,15 +6,18 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.checkgo.core.SessionManager.SessionClearable
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import javax.inject.Singleton
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "app_preferences")
+@Singleton
 class AppDataStoreManager @Inject constructor(
     @ApplicationContext private val context: Context
-) {
+): SessionClearable {
     private val IS_FIRST_TIME_LOGIN = booleanPreferencesKey("is_first_time_login")
 
     suspend fun saveNeedsRegistration(needs: Boolean) {
@@ -24,7 +27,7 @@ class AppDataStoreManager @Inject constructor(
     }
     suspend fun getNeedsRegistration(): Boolean {
         return context.dataStore.data.map { preferences ->
-            preferences[IS_FIRST_TIME_LOGIN] ?: false
+            preferences[IS_FIRST_TIME_LOGIN]?:false
         }.first()
     }
     suspend fun clearAny() {
@@ -32,7 +35,7 @@ class AppDataStoreManager @Inject constructor(
             preferences.remove(IS_FIRST_TIME_LOGIN)
         }
     }
-    suspend fun clearAllData() {
+    override suspend fun clear() {
         context.dataStore.edit { preferences ->
             preferences.clear()
         }

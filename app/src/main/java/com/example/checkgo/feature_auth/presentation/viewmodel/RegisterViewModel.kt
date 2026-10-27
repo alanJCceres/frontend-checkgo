@@ -1,17 +1,15 @@
 package com.example.checkgo.feature_auth.presentation.viewmodel
 
-import android.R
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.checkgo.core.data.enum.UserRole
 import com.example.checkgo.feature_auth.data.dto.RegisterUserRequestDto
-import com.example.checkgo.feature_auth.domain.usecase.LoginUserUseCase
 import com.example.checkgo.feature_auth.domain.usecase.RegisterUserUseCase
-import com.example.checkgo.feature_auth.domain.validators.EmailValidator
-import com.example.checkgo.feature_auth.domain.validators.FullNameValidator
-import com.example.checkgo.feature_auth.domain.validators.PasswordValidator
-import com.example.checkgo.feature_auth.domain.validators.UserNameValidator
+import com.example.checkgo.core.common.EmailValidator
+import com.example.checkgo.core.common.FullNameValidator
+import com.example.checkgo.core.common.PasswordValidator
+import com.example.checkgo.core.common.UserNameValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow

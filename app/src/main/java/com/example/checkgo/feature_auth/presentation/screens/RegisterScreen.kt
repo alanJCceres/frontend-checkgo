@@ -203,6 +203,7 @@ fun RegisterScreen(
                     text="Registrarse",
                     loadingText = "Cargando...",
                     isLoading = uiState.isLoading,
+                    enabled = !uiState.isLoading,
                     onClick = { viewModel.onRegisterClicked() }
                 )
                 Spacer(modifier = Modifier.height(16.dp))

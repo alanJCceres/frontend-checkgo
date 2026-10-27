@@ -1,19 +1,13 @@
 package com.example.checkgo.feature_admin.domain.validators
 
-object FullNameValidator {
-    fun validate(name: String): String? {
+
+object NewPasswordValidator {
+    fun validate(password: String): String? {
         return when {
-            name.isBlank() -> "El nombre no puede estar vacío"
-            name.length < 3 -> "El nombre debe tener al menos 3 caracteres"
-            !name.matches(Regex("^[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+$")) -> "Solo se permiten letras y espacios"
+            password.length < 8 -> "La contraseña debe tener al menos 8 caracteres."
+            password.length > 20 -> "La contraseña no debe tener más de 20 carácteres."
+            !password.matches(Regex("^\\S+$")) -> "contraseña inválida."
             else -> null
         }
-    }
-}
-
-object EmailValidator {
-    fun validate(email: String): String? {
-        if (!email.contains("@")) return "Correo inválido"
-        return null
     }
 }

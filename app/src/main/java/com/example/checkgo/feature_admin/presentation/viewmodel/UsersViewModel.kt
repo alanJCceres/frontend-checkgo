@@ -28,6 +28,8 @@ class UsersViewModel @Inject constructor(
     private val usersUseCase: UsersUseCase,
     private val eventBus: UserEventBus
 ): ViewModel() {
+    private val _selectedUser = MutableStateFlow<UserResponseDto?>(null)
+    val selectedUser: StateFlow<UserResponseDto?> = _selectedUser.asStateFlow()
     private val _uiState = MutableStateFlow<UserUiState>(UserUiState.Loading)
     val uiState: StateFlow<UserUiState> = _uiState.asStateFlow()
 
@@ -76,5 +78,11 @@ class UsersViewModel @Inject constructor(
     }
     fun dismissToast() {
         toastMessage = null
+    }
+    fun onShowInfoUser(user: UserResponseDto){
+        _selectedUser.value = user
+    }
+    fun dismissInfoUser(){
+        _selectedUser.value = null
     }
 }
