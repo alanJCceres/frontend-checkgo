@@ -11,7 +11,7 @@ import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.checkgo.core.ui.components.AppBottomBar
 import com.example.checkgo.feature_admin.presentation.screens.EditUserScreen
+import com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen.registerLocationGraph
 import com.example.checkgo.feature_admin.presentation.screens.UsersScreen
 import com.example.checkgo.feature_user.presentation.screens.ReportsUserScreen
 
@@ -120,6 +121,7 @@ fun AppNavigation(
                 composable("editUser/{userId}",
                     arguments = listOf(navArgument("userId") { type = NavType.StringType })
                     ){ EditUserScreen() }
+                registerLocationGraph(navController)
 
                 // --- Pantallas USER ---
                 composable("homeUser"){ HomeUserScreen(navController=navController) }
