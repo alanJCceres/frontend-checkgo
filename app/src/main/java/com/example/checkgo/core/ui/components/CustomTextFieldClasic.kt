@@ -47,7 +47,8 @@ fun CustomTextFieldClasic(
     errorMessage: String? = null,
     isPassword: Boolean = false,
     isPasswordVisible: Boolean = false,
-    onPasswordToggleClick: () -> Unit = {}
+    onPasswordToggleClick: () -> Unit = {},
+    enabled: Boolean = true
 ) {
     var hasHadFocus by remember { mutableStateOf(false) }
     val isDark = isSystemInDarkTheme()
@@ -95,6 +96,7 @@ fun CustomTextFieldClasic(
                     contentDescription = null) } },
             placeholder = { Text(text = placeholder) },
             isError = isError,
+            enabled = enabled,
             keyboardOptions = keyboardOptions,
             singleLine = true,
             shape = RoundedCornerShape(14.dp),

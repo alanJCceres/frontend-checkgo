@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
@@ -51,6 +52,8 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import java.util.Locale
 import androidx.compose.runtime.setValue
+import com.example.checkgo.core.ui.components.SecurityBottomSheet
+import com.example.checkgo.core.ui.components.Step1LocationBottomSheet
 
 private val DefaultLatLng = LatLng(-16.29, -63.59)
 private const val DefaultZoom = 5f
@@ -162,23 +165,12 @@ fun Step1RegLocationScreen(
         )
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        OutlinedTextField(
-            value = state.nombreLocation,
-            onValueChange = { onChange(state.copy(nombreLocation = it, nombreLocationError = null)) },
-            label = { Text("Nombre de la ubicación") },
-            isError = state.nombreLocationError != null,
-            supportingText = state.nombreLocationError?.let { { Text(it) } },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
+    //DESDE AQUI MODIFICAR
+    Box(
+        modifier = Modifier
 
-        Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+            .fillMaxSize()
+    ){
             GoogleMap(
                 modifier = Modifier.matchParentSize(),
                 cameraPositionState = cameraPositionState,
@@ -196,26 +188,76 @@ fun Step1RegLocationScreen(
                     .size(48.dp)
                     .offset(y = (-24).dp)
             )
-        }
-
-        Text(
-            text = if (state.latitud.isNotBlank() && state.longitud.isNotBlank())
-                "Lat: ${state.latitud}  |  Lng: ${state.longitud}"
-            else
-                "Mueve el mapa para seleccionar un punto",
-            style = MaterialTheme.typography.bodyMedium
-        )
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            OutlinedButton(onClick = onBack, modifier = Modifier.weight(1f)) { Text("Atrás") }
-            Button(
-                onClick = onNext,
-                enabled = state.latitud.isNotBlank() && state.longitud.isNotBlank(),
-                modifier = Modifier.weight(1f)
-            ) { Text("Siguiente") }
-        }
     }
+    Step1LocationBottomSheet(
+        nameLocation = state.nombreLocation,
+        onNameLocationChange = { onChange(state.copy(nombreLocation = it, nombreLocationError = null)) },
+        isErrorNameLocation = state.nombreLocationError != null,
+        errorMessageNameLocation = state.nombreLocationError,
+        address = state.address,
+        onAddressChange = { onChange(state.copy(address = it)) },
+        onDismissRequest = {},
+        onNextClick = onNext,
+        buttonEnabled = state.latitud.isNotBlank() && state.longitud.isNotBlank(),
+        latitudLogitud = if (state.latitud.isNotBlank() && state.longitud.isNotBlank())
+            "Lat: ${state.latitud}  |  Lng: ${state.longitud}"
+        else
+            "Mueve el mapa para seleccionar un punto"
+    )
+//    Column(
+//        modifier = modifier
+//            .fillMaxSize()
+//            .padding(16.dp),
+//        verticalArrangement = Arrangement.spacedBy(12.dp)
+//    ) {
+//        OutlinedTextField(
+//            value = state.nombreLocation,
+//            onValueChange = { onChange(state.copy(nombreLocation = it, nombreLocationError = null)) },
+//            label = { Text("Nombre de la ubicación") },
+//            isError = state.nombreLocationError != null,
+//            supportingText = state.nombreLocationError?.let { { Text(it) } },
+//            singleLine = true,
+//            modifier = Modifier.fillMaxWidth()
+//        )
+//
+//        Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+//            GoogleMap(
+//                modifier = Modifier.matchParentSize(),
+//                cameraPositionState = cameraPositionState,
+//                properties = mapProperties,
+//                uiSettings = mapUiSettings
+//            )
+//
+//            // Pin fijo al centro: la punta queda exactamente en el centro del mapa
+//            Icon(
+//                imageVector = Icons.Default.LocationOn,
+//                contentDescription = "Punto seleccionado",
+//                tint = MaterialTheme.colorScheme.error,
+//                modifier = Modifier
+//                    .align(Alignment.Center)
+//                    .size(48.dp)
+//                    .offset(y = (-24).dp)
+//            )
+//        }
+//
+//        Text(
+//            text = if (state.latitud.isNotBlank() && state.longitud.isNotBlank())
+//                "Lat: ${state.latitud}  |  Lng: ${state.longitud}"
+//            else
+//                "Mueve el mapa para seleccionar un punto",
+//            style = MaterialTheme.typography.bodyMedium
+//        )
+//
+//        Row(
+//            modifier = Modifier.fillMaxWidth(),
+//            horizontalArrangement = Arrangement.spacedBy(12.dp)
+//        ) {
+//            OutlinedButton(onClick = onBack, modifier = Modifier.weight(1f)) { Text("Atrás") }
+//            Button(
+//                onClick = onNext,
+//                enabled = state.latitud.isNotBlank() && state.longitud.isNotBlank(),
+//                modifier = Modifier.weight(1f)
+//            ) { Text("Siguiente") }
+//        }
+//    }
 }
