@@ -2,7 +2,6 @@ package com.example.checkgo.feature_admin.presentation.viewmodel
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen.Step1State
 import com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen.Step2State
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -11,6 +10,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
+
+data class Step1State(
+    val nombreLocation: String = "",
+    val address: String = "",
+    val latitud: String = "",
+    val longitud: String = "",
+
+    val nombreLocationError: String? = null,
+)
 
 data class RegistroUiState(
     val step1: Step1State = Step1State(),
