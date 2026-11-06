@@ -2,13 +2,19 @@ package com.example.checkgo.feature_admin.presentation.viewmodel
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.checkgo.feature_admin.data.repository.GeocoderRepository
+import com.example.checkgo.feature_admin.domain.validators.NewLocationNameValidator
 import com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen.Step2State
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import java.util.Locale
 import javax.inject.Inject
 
 data class Step1State(
@@ -34,8 +40,10 @@ sealed interface RegistroEvent {
 
 @HiltViewModel
 class RegisterLocationViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
+    private val geocoderRepository: GeocoderRepository
 ): ViewModel() {
+    private var geocodeJob: Job? = null
     private val _uiState = MutableStateFlow(RegistroUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -47,9 +55,30 @@ class RegisterLocationViewModel @Inject constructor(
 
 
     fun validateStep1(): Boolean {
-        return true;
+        val estadoActualStep1 = _uiState.value.step1
+        val locationNamevalidationError = NewLocationNameValidator.validate(estadoActualStep1.nombreLocation)
+        _uiState.update { it.copy(
+            step1 = estadoActualStep1.copy(nombreLocationError = locationNamevalidationError)
+        ) }
+        return locationNamevalidationError == null;
     }
     fun validateStep2(): Boolean {
         return true;
+    }
+    fun onMapPositionSelected(lat: Double, lng: Double) {
+        _uiState.update {
+            it.copy(
+                step1 = it.step1.copy(
+                    latitud = String.format(Locale.US, "%.6f", lat),
+                    longitud = String.format(Locale.US, "%.6f", lng)
+                )
+            )
+        }
+
+        geocodeJob?.cancel() // si el usuario vuelve a mover el mapa, descarta la búsqueda anterior
+        geocodeJob = viewModelScope.launch {
+            val address = geocoderRepository.getAddress(lat, lng) ?: return@launch
+            _uiState.update { it.copy(step1 = it.step1.copy(address = address)) }
+        }
     }
 }

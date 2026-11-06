@@ -29,7 +29,7 @@ fun NavGraphBuilder.registerLocationGraph(navController: NavHostController)
                  state = state.step1,
                  onChange = vm::onStep1Change,
                  onNext = { if (vm.validateStep1()) navController.navigate(Step2Route) },
-                 onBack = { navController.popBackStack() }
+                 onMapPositionSelected = vm::onMapPositionSelected
              )
          }
 

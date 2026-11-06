@@ -11,3 +11,12 @@ object NewPasswordValidator {
         }
     }
 }
+object NewLocationNameValidator {
+    fun validate(locationName: String): String? {
+        return when {
+            locationName.length < 3 -> "El nombre debe tener al menos 3 caracteres."
+            locationName.length > 100 -> "El nombre no debe tener más de 20 carácteres."
+            else -> null
+        }
+    }
+}

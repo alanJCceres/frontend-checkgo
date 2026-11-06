@@ -2,24 +2,23 @@ package com.example.checkgo.feature_admin.presentation.screens.registerLocationS
 
 import android.Manifest
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -52,8 +51,11 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import java.util.Locale
 import androidx.compose.runtime.setValue
-import com.example.checkgo.core.ui.components.SecurityBottomSheet
-import com.example.checkgo.core.ui.components.Step1LocationBottomSheet
+import androidx.compose.ui.graphics.Color
+import com.example.checkgo.core.ui.components.Step1LocationContentBottom
+import com.google.maps.android.compose.ComposeMapColorScheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 
 private val DefaultLatLng = LatLng(-16.29, -63.59)
 private const val DefaultZoom = 5f
@@ -64,32 +66,29 @@ private fun Step1State.toLatLngOrNull(): LatLng? {
     val lng = longitud.toDoubleOrNull() ?: return null
     return LatLng(lat, lng)
 }
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun Step1RegLocationScreen(
     state: Step1State,
     onChange: (Step1State) -> Unit,
     onNext: () -> Unit,
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier
+    onMapPositionSelected: (lat: Double, lng: Double) -> Unit,
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-
-    // Evita capturas obsoletas dentro de los efectos de larga vida
-    val currentState by rememberUpdatedState(state)
-    val currentOnChange by rememberUpdatedState(onChange)
-
-    // Si ya había coordenadas (volver desde el step 2), arrancamos ahí
+    var sheetVisible by remember { mutableStateOf(true) }
+    var permissionRequested by rememberSaveable { mutableStateOf(false) }
     val initialLatLng = remember { state.toLatLngOrNull() }
+    var centeredOnUser by rememberSaveable { mutableStateOf(initialLatLng != null) }
+    val currentOnMapPositionSelected by rememberUpdatedState(onMapPositionSelected)
+
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
             initialLatLng ?: DefaultLatLng,
             if (initialLatLng != null) UserZoom else DefaultZoom
         )
     }
-
-    // ---- Permisos (opcionales: el mapa funciona sin ellos) ----
+    // Verificamos permisos de la camara
     val permissionsState = rememberMultiplePermissionsState(
         listOf(
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -97,8 +96,18 @@ fun Step1RegLocationScreen(
         )
     )
     val hasLocationPermission = permissionsState.permissions.any { it.status.isGranted }
+    val mapProperties = remember(hasLocationPermission) {
+        MapProperties(isMyLocationEnabled = hasLocationPermission)
+    }
+    val mapUiSettings = remember(hasLocationPermission) {
+        MapUiSettings(
+            myLocationButtonEnabled = hasLocationPermission,
+            zoomControlsEnabled = false,
+            mapToolbarEnabled = false
+        )
+    }
 
-    var permissionRequested by rememberSaveable { mutableStateOf(false) }
+
     LaunchedEffect(Unit) {
         if (!permissionRequested && !hasLocationPermission) {
             permissionRequested = true
@@ -106,8 +115,6 @@ fun Step1RegLocationScreen(
         }
     }
 
-    // ---- Centrar una sola vez en la ubicación del usuario ----
-    var centeredOnUser by rememberSaveable { mutableStateOf(initialLatLng != null) }
 
     @SuppressLint("MissingPermission")
     fun centerOnUserOnce() {
@@ -117,8 +124,7 @@ fun Step1RegLocationScreen(
                 CancellationTokenSource().token
             )
             .addOnSuccessListener { location ->
-                // location es null si el GPS está apagado: no pasa nada, el mapa sigue usable
-                if (location != null && !centeredOnUser) {
+                if (location != null && !centeredOnUser) { // location es null si el GPS está apagado: no pasa nada, el mapa sigue usable
                     centeredOnUser = true
                     scope.launch {
                         cameraPositionState.animate(
@@ -136,8 +142,8 @@ fun Step1RegLocationScreen(
         if (hasLocationPermission && !centeredOnUser) centerOnUserOnce()
     }
 
-    // ---- Cuando la cámara se detiene tras un movimiento, guardamos el centro ----
-    LaunchedEffect(cameraPositionState) {
+    // Guarda automaticamente el centro cuando se detiene la camara
+    LaunchedEffect(cameraPositionState,) {
         snapshotFlow { cameraPositionState.isMoving }
             .filter { moving ->
                 !moving && cameraPositionState.cameraMoveStartedReason !=
@@ -145,119 +151,66 @@ fun Step1RegLocationScreen(
             }
             .collect {
                 val target = cameraPositionState.position.target
-                currentOnChange(
-                    currentState.copy(
-                        latitud = String.format(Locale.US, "%.6f", target.latitude),
-                        longitud = String.format(Locale.US, "%.6f", target.longitude)
-                    )
-                )
+                currentOnMapPositionSelected(target.latitude, target.longitude)
             }
     }
 
-    val mapProperties = remember(hasLocationPermission) {
-        MapProperties(isMyLocationEnabled = hasLocationPermission)
+    //Esconde y muestra el sheet
+    LaunchedEffect(cameraPositionState) {
+        snapshotFlow { cameraPositionState.isMoving }
+            .collectLatest { moving ->
+                if (moving) {
+                    sheetVisible = false
+                } else {
+                    delay(250)
+                    sheetVisible = true
+                }
+            }
     }
-    val mapUiSettings = remember(hasLocationPermission) {
-        MapUiSettings(
-            myLocationButtonEnabled = hasLocationPermission,
-            zoomControlsEnabled = false,
-            mapToolbarEnabled = false
+
+    //INTERFAZ
+    Box(modifier = Modifier.fillMaxSize()){
+
+        GoogleMap(
+            modifier = Modifier.matchParentSize(),
+            cameraPositionState = cameraPositionState,
+            properties = mapProperties,
+            uiSettings = mapUiSettings,
+            mapColorScheme = ComposeMapColorScheme.LIGHT
         )
+
+        Icon(
+            imageVector = Icons.Default.LocationOn,
+            contentDescription = "Punto seleccionado",
+            tint = MaterialTheme.colorScheme.error,
+            modifier = Modifier
+                .align(Alignment.Center)
+                .size(48.dp)
+                .offset(y = (-24).dp)
+        )
+        //BotomSheet
+        AnimatedVisibility (
+            visible = sheetVisible,
+            modifier = Modifier.align(Alignment.BottomCenter),
+            enter = slideInVertically (initialOffsetY = { it }) + fadeIn(),
+            exit = slideOutVertically (targetOffsetY = { it }) + fadeOut()
+        ) {
+            Surface(
+                shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+                color = Color.White,
+                shadowElevation = 8.dp,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Step1LocationContentBottom(
+                    nameLocation = state.nombreLocation,
+                    onNameLocationChange = { onChange(state.copy(nombreLocation = it, nombreLocationError = null)) },
+                    isErrorNameLocation = state.nombreLocationError != null,
+                    errorMessageNameLocation = state.nombreLocationError,
+                    address = state.address,
+                    onNextClick = onNext,
+                    buttonEnabled = state.latitud.isNotBlank() && state.longitud.isNotBlank(),
+                )
+            }
+        }
     }
-
-    //DESDE AQUI MODIFICAR
-    Box(
-        modifier = Modifier
-
-            .fillMaxSize()
-    ){
-            GoogleMap(
-                modifier = Modifier.matchParentSize(),
-                cameraPositionState = cameraPositionState,
-                properties = mapProperties,
-                uiSettings = mapUiSettings
-            )
-
-            // Pin fijo al centro: la punta queda exactamente en el centro del mapa
-            Icon(
-                imageVector = Icons.Default.LocationOn,
-                contentDescription = "Punto seleccionado",
-                tint = MaterialTheme.colorScheme.error,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .size(48.dp)
-                    .offset(y = (-24).dp)
-            )
-    }
-    Step1LocationBottomSheet(
-        nameLocation = state.nombreLocation,
-        onNameLocationChange = { onChange(state.copy(nombreLocation = it, nombreLocationError = null)) },
-        isErrorNameLocation = state.nombreLocationError != null,
-        errorMessageNameLocation = state.nombreLocationError,
-        address = state.address,
-        onAddressChange = { onChange(state.copy(address = it)) },
-        onDismissRequest = {},
-        onNextClick = onNext,
-        buttonEnabled = state.latitud.isNotBlank() && state.longitud.isNotBlank(),
-        latitudLogitud = if (state.latitud.isNotBlank() && state.longitud.isNotBlank())
-            "Lat: ${state.latitud}  |  Lng: ${state.longitud}"
-        else
-            "Mueve el mapa para seleccionar un punto"
-    )
-//    Column(
-//        modifier = modifier
-//            .fillMaxSize()
-//            .padding(16.dp),
-//        verticalArrangement = Arrangement.spacedBy(12.dp)
-//    ) {
-//        OutlinedTextField(
-//            value = state.nombreLocation,
-//            onValueChange = { onChange(state.copy(nombreLocation = it, nombreLocationError = null)) },
-//            label = { Text("Nombre de la ubicación") },
-//            isError = state.nombreLocationError != null,
-//            supportingText = state.nombreLocationError?.let { { Text(it) } },
-//            singleLine = true,
-//            modifier = Modifier.fillMaxWidth()
-//        )
-//
-//        Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
-//            GoogleMap(
-//                modifier = Modifier.matchParentSize(),
-//                cameraPositionState = cameraPositionState,
-//                properties = mapProperties,
-//                uiSettings = mapUiSettings
-//            )
-//
-//            // Pin fijo al centro: la punta queda exactamente en el centro del mapa
-//            Icon(
-//                imageVector = Icons.Default.LocationOn,
-//                contentDescription = "Punto seleccionado",
-//                tint = MaterialTheme.colorScheme.error,
-//                modifier = Modifier
-//                    .align(Alignment.Center)
-//                    .size(48.dp)
-//                    .offset(y = (-24).dp)
-//            )
-//        }
-//
-//        Text(
-//            text = if (state.latitud.isNotBlank() && state.longitud.isNotBlank())
-//                "Lat: ${state.latitud}  |  Lng: ${state.longitud}"
-//            else
-//                "Mueve el mapa para seleccionar un punto",
-//            style = MaterialTheme.typography.bodyMedium
-//        )
-//
-//        Row(
-//            modifier = Modifier.fillMaxWidth(),
-//            horizontalArrangement = Arrangement.spacedBy(12.dp)
-//        ) {
-//            OutlinedButton(onClick = onBack, modifier = Modifier.weight(1f)) { Text("Atrás") }
-//            Button(
-//                onClick = onNext,
-//                enabled = state.latitud.isNotBlank() && state.longitud.isNotBlank(),
-//                modifier = Modifier.weight(1f)
-//            ) { Text("Siguiente") }
-//        }
-//    }
 }
