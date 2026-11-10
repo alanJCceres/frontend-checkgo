@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.checkgo.feature_admin.data.repository.GeocoderRepository
 import com.example.checkgo.feature_admin.domain.validators.NewLocationNameValidator
-import com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen.Step2State
+import com.example.checkgo.feature_admin.domain.validators.NewToleranceValidator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -25,10 +25,30 @@ data class Step1State(
 
     val nombreLocationError: String? = null,
 )
+data class Step2State(
+    val arrivalAndDeparture: Boolean = true,
+    val arrivalOnly: Boolean = false,
+    val exitOnly: Boolean = false,
+    val tolerance: Int=0,
+    val radio: Int=20,
+
+    val toleranceError: String? = null,
+)
+data class Step3State(
+    val descripcion: String = "",
+)
+data class Step4State(
+    val descripcion: String = "",
+    val descripcionError: String? = null,
+    // ...
+)
 
 data class RegistroUiState(
     val step1: Step1State = Step1State(),
     val step2: Step2State = Step2State(),
+    val step3: Step3State = Step3State(),
+    val step4: Step4State = Step4State(),
+
     val isSubmitting: Boolean = false,
     val submitError: String? = null
 )
@@ -52,6 +72,9 @@ class RegisterLocationViewModel @Inject constructor(
 
     fun onStep1Change(new: Step1State) = _uiState.update { it.copy(step1 = new) }
     fun onStep2Change(new: Step2State) = _uiState.update { it.copy(step2 = new) }
+    fun onStep3Change(new: Step3State) = _uiState.update { it.copy(step3 = new) }
+    fun onStep4Change(new: Step4State) = _uiState.update { it.copy(step4 = new) }
+
 
 
     fun validateStep1(): Boolean {
@@ -63,8 +86,25 @@ class RegisterLocationViewModel @Inject constructor(
         return locationNamevalidationError == null;
     }
     fun validateStep2(): Boolean {
+        val estadoActualStep2 = _uiState.value.step2
+        val toleranceValidationError = NewToleranceValidator.validate(estadoActualStep2.tolerance)
+        _uiState.update { it.copy(
+            step2 = estadoActualStep2.copy(toleranceError = toleranceValidationError)
+        ) }
+        return toleranceValidationError == null;
+    }
+    fun validateStep3(): Boolean {
         return true;
     }
+    fun validateStep4(): Boolean {
+        return true;
+    }
+    fun submit() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSubmitting = true) }
+        }
+    }
+
     fun onMapPositionSelected(lat: Double, lng: Double) {
         _uiState.update {
             it.copy(

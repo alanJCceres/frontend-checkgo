@@ -10,6 +10,7 @@ import androidx.navigation.navigation
 import com.example.checkgo.feature_admin.presentation.viewmodel.RegisterLocationViewModel
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModelStoreOwner
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.Serializable
 @Serializable object RegisterLocationGraph
 @Serializable object Step1Route
@@ -38,10 +39,38 @@ fun NavGraphBuilder.registerLocationGraph(navController: NavHostController)
              val vm: RegisterLocationViewModel = hiltViewModel(parent as ViewModelStoreOwner)
              val state by vm.uiState.collectAsStateWithLifecycle()
 
+             val lat = state.step1.latitud.toDoubleOrNull()
+             val lng = state.step1.longitud.toDoubleOrNull()
+
              Step2RegLocationScreen(
+                 center = LatLng(lat!!, lng!!),
                  state = state.step2,
-                 onChange = { vm.onStep2Change(it) },
-                 onNext = { if (vm.validateStep2()) navController.navigate("homeAdmin") },
+                 onChange = vm::onStep2Change,
+                 onNext = { if (vm.validateStep2()) navController.navigate(Step3Route) },
+                 onBack = { navController.popBackStack() }
+             )
+         }
+
+         composable<Step3Route> { entry ->
+             val parent = remember<Any>(entry) { navController.getBackStackEntry<RegisterLocationGraph>() }
+             val vm: RegisterLocationViewModel = hiltViewModel(parent as ViewModelStoreOwner)
+             val state by vm.uiState.collectAsStateWithLifecycle()
+             Step3RegLocationScreen(
+                 state = state.step3,
+                 onChange = vm::onStep3Change,
+                 onNext = { if (vm.validateStep3()) navController.navigate(Step4Route) },
+                 onBack = { navController.popBackStack() }
+             )
+         }
+
+         composable<Step4Route> { entry ->
+             val parent = remember<Any>(entry) { navController.getBackStackEntry<RegisterLocationGraph>() }
+             val vm: RegisterLocationViewModel = hiltViewModel(parent as ViewModelStoreOwner)
+             val state by vm.uiState.collectAsStateWithLifecycle()
+             Step4RegLocationScreen(
+                 state = state.step4,
+                 onChange = vm::onStep4Change,
+                 onNext = { if (vm.validateStep4()) vm.submit() },
                  onBack = { navController.popBackStack() }
              )
          }

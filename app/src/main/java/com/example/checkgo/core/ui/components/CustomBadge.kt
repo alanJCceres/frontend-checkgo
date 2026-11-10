@@ -53,7 +53,9 @@ fun CustomBadge(
     text: String,
     modifier: Modifier = Modifier,
     colors: BadgeColors = BadgeDefaults.Gray,
-    cornerRadius: Dp = 16.dp
+    cornerRadius: Dp = 16.dp,
+    fontSize: Int = 12,
+    fontWeight: FontWeight = FontWeight.Medium
 ) {
     Surface(
         shape = RoundedCornerShape(cornerRadius),
@@ -64,8 +66,8 @@ fun CustomBadge(
         Text(
             text = text,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium
+            fontSize = fontSize.sp,
+            fontWeight = fontWeight
         )
     }
 }

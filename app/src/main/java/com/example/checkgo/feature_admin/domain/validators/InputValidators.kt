@@ -20,3 +20,12 @@ object NewLocationNameValidator {
         }
     }
 }
+object NewToleranceValidator{
+    fun validate(tolerance:Int): String?{
+        return when {
+            tolerance < 0 -> "La tolerancia debe ser mayor o igual a 0."
+            tolerance > 30 -> "La tolerancia no debe ser mayor a 30 minutos."
+            else -> null
+        }
+    }
+}
