@@ -20,6 +20,10 @@ import com.example.checkgo.feature_admin.data.dto.ArrivalLocationDayRequestDto
 import com.example.checkgo.feature_admin.presentation.components.DayScheduleCard
 import com.example.checkgo.feature_admin.presentation.viewmodel.Step3State
 import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.graphics.Color
+import com.example.checkgo.core.ui.theme.StyleTextBodySmall
+import com.example.checkgo.core.ui.theme.StyleTextSubHeader
+import com.example.checkgo.core.ui.theme.StyleTextTituloBody
 
 @Composable
 fun Step3RegLocationScreen(
@@ -37,6 +41,16 @@ fun Step3RegLocationScreen(
             .fillMaxSize()
             .padding(16.dp)
     ) {
+        Text(
+            text = "Horarios del punto de llegada",
+            style = StyleTextTituloBody
+        )
+        Text(
+            text = "Defina los horarios operativos para cada día de la semana.",
+            style = StyleTextBodySmall,
+            color = Color.Gray
+        )
+        Spacer(Modifier.height(12.dp))
         LazyColumn(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -51,10 +65,10 @@ fun Step3RegLocationScreen(
         }
 
         state.scheduleError?.let {
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(14.dp))
             Text(
                 text = it,
-                color = MaterialTheme.colorScheme.error,
+                color = Color.Red,
                 style = MaterialTheme.typography.bodySmall
             )
         }
