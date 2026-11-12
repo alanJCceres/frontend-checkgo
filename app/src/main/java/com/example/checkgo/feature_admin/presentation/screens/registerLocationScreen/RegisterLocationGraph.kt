@@ -57,7 +57,8 @@ fun NavGraphBuilder.registerLocationGraph(navController: NavHostController)
              val state by vm.uiState.collectAsStateWithLifecycle()
              Step3RegLocationScreen(
                  state = state.step3,
-                 onChange = vm::onStep3Change,
+                 mode = state.step2.toScheduleMode(),
+                 onDayChange = vm::onScheduleDayChange,
                  onNext = { if (vm.validateStep3()) navController.navigate(Step4Route) },
                  onBack = { navController.popBackStack() }
              )

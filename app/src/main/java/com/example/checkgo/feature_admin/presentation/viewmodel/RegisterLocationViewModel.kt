@@ -3,9 +3,15 @@ package com.example.checkgo.feature_admin.presentation.viewmodel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.checkgo.feature_admin.data.dto.ArrivalLocationDayRequestDto
 import com.example.checkgo.feature_admin.data.repository.GeocoderRepository
 import com.example.checkgo.feature_admin.domain.validators.NewLocationNameValidator
 import com.example.checkgo.feature_admin.domain.validators.NewToleranceValidator
+import com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen.MAX_INTERVALS_PER_DAY
+import com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen.defaultWeek
+import com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen.isComplete
+import com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen.normalizedFor
+import com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen.toScheduleMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -35,7 +41,8 @@ data class Step2State(
     val toleranceError: String? = null,
 )
 data class Step3State(
-    val descripcion: String = "",
+    val locationSchedules: List<ArrivalLocationDayRequestDto>?=null,
+    val scheduleError: String? = null,
 )
 data class Step4State(
     val descripcion: String = "",
@@ -71,8 +78,29 @@ class RegisterLocationViewModel @Inject constructor(
     val events = _events.receiveAsFlow()
 
     fun onStep1Change(new: Step1State) = _uiState.update { it.copy(step1 = new) }
-    fun onStep2Change(new: Step2State) = _uiState.update { it.copy(step2 = new) }
-    fun onStep3Change(new: Step3State) = _uiState.update { it.copy(step3 = new) }
+    fun onStep2Change(new: Step2State){
+        _uiState.update { cur ->
+            val oldMode = cur.step2.toScheduleMode()
+            val newMode = new.toScheduleMode()
+            cur.copy(
+                step2 = new,
+                step3 = if (oldMode != newMode)
+                    cur.step3.copy(locationSchedules = cur.step3.locationSchedules?.normalizedFor(newMode))
+                else cur.step3
+            )
+        }
+    }
+    fun onScheduleDayChange(new: ArrivalLocationDayRequestDto){
+        _uiState.update { cur ->
+            val currentWeek = cur.step3.locationSchedules ?: defaultWeek()
+            cur.copy(
+                step3 = cur.step3.copy(
+                    locationSchedules = currentWeek.map { if (it.day == new.day) new else it },
+                    scheduleError = null
+                )
+            )
+        }
+    }
     fun onStep4Change(new: Step4State) = _uiState.update { it.copy(step4 = new) }
 
 
@@ -94,7 +122,19 @@ class RegisterLocationViewModel @Inject constructor(
         return toleranceValidationError == null;
     }
     fun validateStep3(): Boolean {
-        return true;
+        val mode = _uiState.value.step2.toScheduleMode()
+        val enabledDays = (_uiState.value.step3.locationSchedules ?: defaultWeek()).filter { it.enabled }
+
+        val error = when {
+            enabledDays.isEmpty() -> "Activa al menos un día"
+            enabledDays.any { it.intervalos.isEmpty() } -> "Cada día activo necesita al menos un horario"
+            enabledDays.any { d -> d.intervalos.any { !it.isComplete(mode) } } -> "Completa todas las horas"
+            enabledDays.any { it.intervalos.size > MAX_INTERVALS_PER_DAY } -> "Máximo $MAX_INTERVALS_PER_DAY horarios por día"
+            enabledDays.any { it.intervalos.distinct().size != it.intervalos.size } -> "Hay horarios repetidos"
+            else -> null
+        }
+        _uiState.update { it.copy(step3 = it.step3.copy(scheduleError = error)) }
+        return error == null
     }
     fun validateStep4(): Boolean {
         return true;
