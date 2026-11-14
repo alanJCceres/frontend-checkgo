@@ -39,8 +39,8 @@ fun CustomButton(
     val contentColor = if (isPrimary) Color.White else MaterialTheme.colorScheme.secondary
 
     // Colores cuando está cargando (deshabilitado)
-    val disabledContainerColor = containerColor.copy(alpha = 0.6f)
-    val disabledContentColor = contentColor.copy(alpha = 0.6f)
+    val disabledContainerColor = if (isPrimary) containerColor.copy(alpha = 0.6f) else containerColor.copy(alpha = 0.1f)
+    val disabledContentColor = if (isPrimary) contentColor.copy(alpha = 0.6f) else contentColor.copy(alpha = 0.1f)
 
     // Borde
     val borderAlpha = if (isLoading) 0.6f else 1f

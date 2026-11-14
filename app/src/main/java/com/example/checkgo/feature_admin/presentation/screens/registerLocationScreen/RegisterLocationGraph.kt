@@ -1,5 +1,6 @@
 package com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen
 
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -10,6 +11,7 @@ import androidx.navigation.navigation
 import com.example.checkgo.feature_admin.presentation.viewmodel.RegisterLocationViewModel
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModelStoreOwner
+import com.example.checkgo.feature_admin.presentation.viewmodel.SaveState
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.Serializable
 @Serializable object RegisterLocationGraph
@@ -68,11 +70,33 @@ fun NavGraphBuilder.registerLocationGraph(navController: NavHostController)
              val parent = remember<Any>(entry) { navController.getBackStackEntry<RegisterLocationGraph>() }
              val vm: RegisterLocationViewModel = hiltViewModel(parent as ViewModelStoreOwner)
              val state by vm.uiState.collectAsStateWithLifecycle()
+             val usersState by vm.usersState.collectAsStateWithLifecycle()
+             val saveState by vm.saveState.collectAsStateWithLifecycle()
+
+             LaunchedEffect(Unit) { vm.loadUsers() }
+
+             LaunchedEffect(saveState) {
+                 if (saveState is SaveState.Success) {
+                     navController.navigate(RegisterLocationSuccessRoute) {
+                         popUpTo<RegisterLocationGraph> { inclusive = true }   // el formulario no queda en el back stack
+                     }
+                 }
+             }
              Step4RegLocationScreen(
+                 usersState = usersState,
                  state = state.step4,
-                 onChange = vm::onStep4Change,
-                 onNext = { if (vm.validateStep4()) vm.submit() },
-                 onBack = { navController.popBackStack() }
+                 saveState = saveState,
+                 onUserSelectionChange = vm::onUserSelectionChange,
+                 onRetry = { vm.loadUsers(force = true) },
+                 onSave = vm::save,
+                 onBack = { navController.popBackStack() },
+                 onRegisterNewUser = { navController.navigate("registerUser") }
+             )
+         }
+
+         composable<RegisterLocationSuccessRoute> {
+             RegisterLocationSuccessScreen(
+                 onFinish = { navController.navigate("homeAdmin") }
              )
          }
 
