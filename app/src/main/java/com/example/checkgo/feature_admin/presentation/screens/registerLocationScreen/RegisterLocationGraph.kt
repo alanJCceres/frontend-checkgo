@@ -11,6 +11,7 @@ import androidx.navigation.navigation
 import com.example.checkgo.feature_admin.presentation.viewmodel.RegisterLocationViewModel
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModelStoreOwner
+import com.example.checkgo.feature_admin.presentation.viewmodel.RegisterLocationUiEvent
 import com.example.checkgo.feature_admin.presentation.viewmodel.SaveState
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.Serializable
@@ -75,10 +76,14 @@ fun NavGraphBuilder.registerLocationGraph(navController: NavHostController)
 
              LaunchedEffect(Unit) { vm.loadUsers() }
 
-             LaunchedEffect(saveState) {
-                 if (saveState is SaveState.Success) {
-                     navController.navigate(RegisterLocationSuccessRoute) {
-                         popUpTo<RegisterLocationGraph> { inclusive = true }   // el formulario no queda en el back stack
+             LaunchedEffect(Unit) {
+                 vm.navigationEvent.collect { event ->
+                     when (event) {
+                         is RegisterLocationUiEvent.Navigate -> {
+                             navController.navigate(event.route) {
+                                 popUpTo<RegisterLocationGraph> { inclusive = true }
+                             }
+                         }
                      }
                  }
              }

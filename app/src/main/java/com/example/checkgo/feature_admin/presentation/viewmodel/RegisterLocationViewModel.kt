@@ -12,6 +12,7 @@ import com.example.checkgo.feature_admin.domain.usecase.UsersUseCase
 import com.example.checkgo.feature_admin.domain.validators.NewLocationNameValidator
 import com.example.checkgo.feature_admin.domain.validators.NewToleranceValidator
 import com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen.MAX_INTERVALS_PER_DAY
+import com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen.RegisterLocationSuccessRoute
 import com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen.defaultWeek
 import com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen.isComplete
 import com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen.normalizedFor
@@ -19,6 +20,7 @@ import com.example.checkgo.feature_admin.presentation.screens.registerLocationSc
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -78,6 +80,10 @@ sealed interface SaveState {
     data class Error(val message: String) : SaveState
 }
 
+sealed interface RegisterLocationUiEvent {
+    data class Navigate(val route: Any) : RegisterLocationUiEvent
+}
+
 @HiltViewModel
 class RegisterLocationViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
@@ -91,6 +97,9 @@ class RegisterLocationViewModel @Inject constructor(
     val usersState = _usersState.asStateFlow()
     private val _saveState = MutableStateFlow<SaveState>(SaveState.Idle)
     val saveState = _saveState.asStateFlow()
+
+    private val _navigationEvent = Channel<RegisterLocationUiEvent>(Channel.BUFFERED)
+    val navigationEvent = _navigationEvent.receiveAsFlow()
     private var usersJob: Job? = null
     private var geocodeJob: Job? = null
 
@@ -216,12 +225,12 @@ class RegisterLocationViewModel @Inject constructor(
         if (_saveState.value is SaveState.Saving) return // evita doble toque
         if (!validateStep4()) return
         val request = null //aqui añadir el request
+
         _saveState.value = SaveState.Saving
         viewModelScope.launch {
-            // TODO: aquí va tu llamada, por ejemplo:
-            // createLocationUseCase(request)
-            //     .onSuccess { _saveState.value = SaveState.Success }
-            //     .onFailure { _saveState.value = SaveState.Error(it.message ?: "No se pudo guardar") }
+            delay(1500)
+            _saveState.value = SaveState.Idle
+            _navigationEvent.send(RegisterLocationUiEvent.Navigate(RegisterLocationSuccessRoute))
         }
     }
 
