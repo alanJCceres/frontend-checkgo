@@ -58,7 +58,7 @@ import com.example.checkgo.core.ui.components.CustomButton
 import com.example.checkgo.core.ui.components.CustomTextField
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.checkgo.core.ui.components.CustomTopToast
 import com.example.checkgo.core.ui.theme.DarkTextColorSecundario

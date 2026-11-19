@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -13,6 +15,11 @@ android {
             minorApiLevel = 1
         }
     }
+    //Para usar el mapa de google
+    val localProps = Properties().apply {
+        rootProject.file("local.properties").takeIf { it.exists() }
+            ?.inputStream()?.use { load(it) }
+    }
 
     defaultConfig {
         applicationId = "com.example.checkgo"
@@ -22,6 +29,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        manifestPlaceholders["MAPS_API_KEY"] = localProps.getProperty("MAPS_API_KEY", "") //para usar el mapa de google
     }
 
     buildTypes {
@@ -34,11 +42,16 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
         compose = true
+    }
+}
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
     }
 }
 
@@ -75,4 +88,8 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
     // Preferences DataStore
     implementation(libs.androidx.datastore.preferences)
+    // Para el mapa de google
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.location)
+    implementation(libs.accompanist.permissions)
 }

@@ -11,3 +11,21 @@ object NewPasswordValidator {
         }
     }
 }
+object NewLocationNameValidator {
+    fun validate(locationName: String): String? {
+        return when {
+            locationName.length < 3 -> "El nombre debe tener al menos 3 caracteres."
+            locationName.length > 100 -> "El nombre no debe tener más de 20 carácteres."
+            else -> null
+        }
+    }
+}
+object NewToleranceValidator{
+    fun validate(tolerance:Int): String?{
+        return when {
+            tolerance < 0 -> "La tolerancia debe ser mayor o igual a 0."
+            tolerance > 30 -> "La tolerancia no debe ser mayor a 30 minutos."
+            else -> null
+        }
+    }
+}

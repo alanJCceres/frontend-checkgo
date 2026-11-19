@@ -50,12 +50,16 @@ val StyleTextSubHeader = TextStyle( //estilo para sub header
 )
 val StyleTextTituloBody = TextStyle( //estilo para titulo del body
     fontWeight = FontWeight.Bold,
-    fontSize = 24.sp,
+    fontSize = 18.sp,
     lineHeight = 26.sp
 )
 val StyleTextBody = TextStyle( //estilo para text normal
     fontSize = 15.sp,
     lineHeight = 23.sp
+)
+val StyleTextBodySmall = TextStyle(
+    fontWeight = FontWeight.Normal,
+    fontSize = 13.sp
 )
 val StyleTextLabelInput = TextStyle( //estilo para label
     fontWeight = FontWeight.SemiBold,
