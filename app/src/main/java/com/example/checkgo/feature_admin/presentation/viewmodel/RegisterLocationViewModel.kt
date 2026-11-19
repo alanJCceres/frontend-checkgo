@@ -1,13 +1,14 @@
 package com.example.checkgo.feature_admin.presentation.viewmodel
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.checkgo.core.bus.UserEvent
 import com.example.checkgo.core.bus.UserEventBus
 import com.example.checkgo.core.data.dto.UserResponseDto
 import com.example.checkgo.feature_admin.data.dto.ArrivalLocationDayRequestDto
+import com.example.checkgo.feature_admin.data.dto.CreateLocationRequestDto
 import com.example.checkgo.feature_admin.data.repository.GeocoderRepository
+import com.example.checkgo.feature_admin.domain.usecase.RegisterArrivalLocationUseCase
 import com.example.checkgo.feature_admin.domain.usecase.UsersUseCase
 import com.example.checkgo.feature_admin.domain.validators.NewLocationNameValidator
 import com.example.checkgo.feature_admin.domain.validators.NewToleranceValidator
@@ -20,7 +21,6 @@ import com.example.checkgo.feature_admin.presentation.screens.registerLocationSc
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -55,7 +55,12 @@ data class Step4State(
     val usersSelected: List<String> = emptyList(),
     val usersError: String? = null,
 )
-
+sealed interface Step4UsersUiState {
+    data object Loading : Step4UsersUiState
+    data class Success(val users: List<UserResponseDto>) : Step4UsersUiState
+    data class Error(val message: String) : Step4UsersUiState
+    data object Empty : Step4UsersUiState
+}
 data class RegistroUiState(
     val step1: Step1State = Step1State(),
     val step2: Step2State = Step2State(),
@@ -65,14 +70,6 @@ data class RegistroUiState(
     val isSubmitting: Boolean = false,
     val submitError: String? = null
 )
-
-sealed interface Step4UsersUiState {
-    data object Loading : Step4UsersUiState
-    data class Success(val users: List<UserResponseDto>) : Step4UsersUiState
-    data class Error(val message: String) : Step4UsersUiState
-    data object Empty : Step4UsersUiState
-}
-
 sealed interface SaveState {
     data object Idle : SaveState
     data object Saving : SaveState
@@ -82,14 +79,16 @@ sealed interface SaveState {
 
 sealed interface RegisterLocationUiEvent {
     data class Navigate(val route: Any) : RegisterLocationUiEvent
+    data class ShowToast(val message: String, val isError: Boolean = true) : RegisterLocationUiEvent
 }
 
 @HiltViewModel
 class RegisterLocationViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
+    //private val savedStateHandle: SavedStateHandle,
     private val geocoderRepository: GeocoderRepository,
     private val usersUseCase: UsersUseCase,
-    private val eventBus: UserEventBus
+    private val eventBus: UserEventBus,
+    private val registerArrivalLocationUseCase: RegisterArrivalLocationUseCase
 ): ViewModel() {
     private val _uiState = MutableStateFlow(RegistroUiState())
     val uiState = _uiState.asStateFlow()
@@ -97,11 +96,11 @@ class RegisterLocationViewModel @Inject constructor(
     val usersState = _usersState.asStateFlow()
     private val _saveState = MutableStateFlow<SaveState>(SaveState.Idle)
     val saveState = _saveState.asStateFlow()
-
     private val _navigationEvent = Channel<RegisterLocationUiEvent>(Channel.BUFFERED)
     val navigationEvent = _navigationEvent.receiveAsFlow()
     private var usersJob: Job? = null
     private var geocodeJob: Job? = null
+
 
     init {
         viewModelScope.launch {
@@ -112,6 +111,8 @@ class RegisterLocationViewModel @Inject constructor(
             }
         }
     }
+
+    //FUNCION PARA CARGAR USUARIOS EN EL PASO 4
     fun loadUsers(force: Boolean = false, silent: Boolean = false) {
 
         if (!force && _usersState.value is Step4UsersUiState.Success) return
@@ -149,6 +150,8 @@ class RegisterLocationViewModel @Inject constructor(
             }
         }
     }
+
+    //ONCHANGES DE LOS STEPS
     fun onStep1Change(new: Step1State) = _uiState.update { it.copy(step1 = new) }
     fun onStep2Change(new: Step2State){
         _uiState.update { cur ->
@@ -183,7 +186,7 @@ class RegisterLocationViewModel @Inject constructor(
         }
     }
 
-
+    //VALIDADORES
     fun validateStep1(): Boolean {
         val estadoActualStep1 = _uiState.value.step1
         val locationNamevalidationError = NewLocationNameValidator.validate(estadoActualStep1.nombreLocation)
@@ -212,7 +215,19 @@ class RegisterLocationViewModel @Inject constructor(
             enabledDays.any { it.intervalos.distinct().size != it.intervalos.size } -> "Hay horarios repetidos"
             else -> null
         }
-        _uiState.update { it.copy(step3 = it.step3.copy(scheduleError = error)) }
+
+        //si no tiene ningun error limpiamos los intervalos de los dias en false
+        _uiState.update { cur ->
+            val current = cur.step3.locationSchedules ?: defaultWeek()
+            val schedules = if (error == null) {
+                current.map { day ->
+                    if (!day.enabled && day.intervalos.isNotEmpty()) day.copy(intervalos = emptyList()) else day
+                }
+            } else current
+
+            cur.copy(step3 = cur.step3.copy(locationSchedules = schedules, scheduleError = error))
+        }
+
         return error == null
     }
     fun validateStep4(): Boolean {
@@ -221,20 +236,47 @@ class RegisterLocationViewModel @Inject constructor(
         _uiState.update { it.copy(step4 = it.step4.copy(usersError = error)) }
         return error == null
     }
+
+    //FUNCION PARA GUARDAR LA UBICACION
     fun save() {
         if (_saveState.value is SaveState.Saving) return // evita doble toque
         if (!validateStep4()) return
-        val request = null //aqui añadir el request
-
+        val step1 = _uiState.value.step1
+        val step2 = _uiState.value.step2
+        val step3 = _uiState.value.step3
+        val step4 = _uiState.value.step4
+        val requestArrivalLocation = CreateLocationRequestDto(
+            locationName = step1.nombreLocation,
+            address = step1.address,
+            latitude = step1.latitud.toDouble(),
+            longitude = step1.longitud.toDouble(),
+            radio = step2.radio,
+            tolerance = step2.tolerance,
+            arrivalOnly = step2.arrivalOnly,
+            arrivalAndDeparture = step2.arrivalAndDeparture,
+            exitOnly = step2.exitOnly,
+            locationSchedules = step3.locationSchedules!!,
+            assignedUsers = step4.usersSelected
+        )
         _saveState.value = SaveState.Saving
         viewModelScope.launch {
-            delay(1500)
-            _saveState.value = SaveState.Idle
-            _navigationEvent.send(RegisterLocationUiEvent.Navigate(RegisterLocationSuccessRoute))
+            registerArrivalLocationUseCase(requestArrivalLocation).fold(
+                onSuccess = { message ->
+                    _saveState.value = SaveState.Success
+                    _navigationEvent.send(RegisterLocationUiEvent.Navigate(RegisterLocationSuccessRoute))
+                    _saveState.value = SaveState.Idle
+                },
+                onFailure = { exception ->
+                    _saveState.value = SaveState.Idle
+                    _navigationEvent.send(
+                        RegisterLocationUiEvent.ShowToast(exception.message ?: "Error desconocido")
+                    )
+                }
+            )
         }
     }
 
-    //funcion auxiliar para el mapa
+    //FUNCION AUXILIAR DEL MAPA
     fun onMapPositionSelected(lat: Double, lng: Double) {
         _uiState.update {
             it.copy(

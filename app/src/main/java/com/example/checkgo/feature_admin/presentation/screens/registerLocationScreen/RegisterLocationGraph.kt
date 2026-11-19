@@ -1,5 +1,12 @@
 package com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -10,11 +17,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.checkgo.feature_admin.presentation.viewmodel.RegisterLocationViewModel
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModelStoreOwner
 import com.example.checkgo.feature_admin.presentation.viewmodel.RegisterLocationUiEvent
-import com.example.checkgo.feature_admin.presentation.viewmodel.SaveState
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.Serializable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import com.example.checkgo.core.ui.components.CustomTopToast
+import kotlinx.coroutines.delay
+
 @Serializable object RegisterLocationGraph
 @Serializable object Step1Route
 @Serializable object Step2Route
@@ -74,6 +87,15 @@ fun NavGraphBuilder.registerLocationGraph(navController: NavHostController)
              val usersState by vm.usersState.collectAsStateWithLifecycle()
              val saveState by vm.saveState.collectAsStateWithLifecycle()
 
+             var toastMessage by remember { mutableStateOf<String?>(null) }
+             var isErrorToast by remember { mutableStateOf(true) }
+
+             LaunchedEffect(toastMessage) {
+                 if (toastMessage != null) {
+                     delay(4000)
+                     toastMessage = null
+                 }
+             }
              LaunchedEffect(Unit) { vm.loadUsers() }
 
              LaunchedEffect(Unit) {
@@ -84,19 +106,36 @@ fun NavGraphBuilder.registerLocationGraph(navController: NavHostController)
                                  popUpTo<RegisterLocationGraph> { inclusive = true }
                              }
                          }
+                         is RegisterLocationUiEvent.ShowToast -> {
+                             isErrorToast = event.isError
+                             toastMessage = event.message
+                         }
                      }
                  }
              }
-             Step4RegLocationScreen(
-                 usersState = usersState,
-                 state = state.step4,
-                 saveState = saveState,
-                 onUserSelectionChange = vm::onUserSelectionChange,
-                 onRetry = { vm.loadUsers(force = true) },
-                 onSave = vm::save,
-                 onBack = { navController.popBackStack() },
-                 onRegisterNewUser = { navController.navigate("registerUser") }
-             )
+             Box(modifier = Modifier.fillMaxSize()) {
+                 Step4RegLocationScreen(
+                     usersState = usersState,
+                     state = state.step4,
+                     saveState = saveState,
+                     onUserSelectionChange = vm::onUserSelectionChange,
+                     onRetry = { vm.loadUsers(force = true) },
+                     onSave = vm::save,
+                     onBack = { navController.popBackStack() },
+                     onRegisterNewUser = { navController.navigate("registerUser") }
+                 )
+                 AnimatedVisibility(
+                     visible = toastMessage != null,
+                     enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
+                     exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut(),
+                     modifier = Modifier.align(Alignment.TopCenter)
+                 ) {
+                     toastMessage?.let { message ->
+                         CustomTopToast(message = message, isError = isErrorToast)
+                     }
+                 }
+             }
+
          }
 
          composable<RegisterLocationSuccessRoute> {
