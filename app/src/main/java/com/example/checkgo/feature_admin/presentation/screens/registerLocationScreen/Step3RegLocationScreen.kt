@@ -22,7 +22,6 @@ import com.example.checkgo.feature_admin.presentation.viewmodel.Step3State
 import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.graphics.Color
 import com.example.checkgo.core.ui.theme.StyleTextBodySmall
-import com.example.checkgo.core.ui.theme.StyleTextSubHeader
 import com.example.checkgo.core.ui.theme.StyleTextTituloBody
 
 @Composable
@@ -39,12 +38,13 @@ fun Step3RegLocationScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(20.dp,0.dp,20.dp,20.dp)
     ) {
         Text(
-            text = "Horarios del punto de llegada",
+            text = "Configura los horarios por día",
             style = StyleTextTituloBody
         )
+        Spacer(Modifier.height(3.dp))
         Text(
             text = "Defina los horarios operativos para cada día de la semana.",
             style = StyleTextBodySmall,

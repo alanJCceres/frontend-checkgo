@@ -25,7 +25,9 @@ import kotlinx.serialization.Serializable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
 import com.example.checkgo.core.ui.components.CustomTopToast
+import com.example.checkgo.feature_admin.presentation.components.RegisterLocationStepScaffold
 import kotlinx.coroutines.delay
 
 @Serializable object RegisterLocationGraph
@@ -42,12 +44,20 @@ fun NavGraphBuilder.registerLocationGraph(navController: NavHostController)
              val vm: RegisterLocationViewModel = hiltViewModel(parent as ViewModelStoreOwner)
              val state by vm.uiState.collectAsStateWithLifecycle()
 
-             Step1RegLocationScreen(
-                 state = state.step1,
-                 onChange = vm::onStep1Change,
-                 onNext = { if (vm.validateStep1()) navController.navigate(Step2Route) },
-                 onMapPositionSelected = vm::onMapPositionSelected
-             )
+             RegisterLocationStepScaffold(
+                 currentStep = 1,
+                 previousStep = vm.stepperFrom,
+                 onStepShown = vm::onStepperShown,
+                 overlay = true
+             ) {
+                 Step1RegLocationScreen(
+                     state = state.step1,
+                     onChange = vm::onStep1Change,
+                     onNext = { if (vm.validateStep1()) navController.navigate(Step2Route) },
+                     onMapPositionSelected = vm::onMapPositionSelected
+                 )
+             }
+
          }
 
          composable<Step2Route> { entry ->
@@ -58,26 +68,43 @@ fun NavGraphBuilder.registerLocationGraph(navController: NavHostController)
              val lat = state.step1.latitud.toDoubleOrNull()
              val lng = state.step1.longitud.toDoubleOrNull()
 
-             Step2RegLocationScreen(
-                 center = LatLng(lat!!, lng!!),
-                 state = state.step2,
-                 onChange = vm::onStep2Change,
-                 onNext = { if (vm.validateStep2()) navController.navigate(Step3Route) },
-                 onBack = { navController.popBackStack() }
-             )
+             RegisterLocationStepScaffold(
+                 currentStep = 2,
+                 previousStep = vm.stepperFrom,
+                 onStepShown = vm::onStepperShown,
+                 onStepClick = { step -> navController.popToStep(step) }
+             ){
+                 Step2RegLocationScreen(
+                     center = LatLng(lat!!, lng!!),
+                     state = state.step2,
+                     onChange = vm::onStep2Change,
+                     onNext = { if (vm.validateStep2()) navController.navigate(Step3Route) },
+                     onBack = { navController.popBackStack() }
+                 )
+             }
+
          }
 
          composable<Step3Route> { entry ->
              val parent = remember<Any>(entry) { navController.getBackStackEntry<RegisterLocationGraph>() }
              val vm: RegisterLocationViewModel = hiltViewModel(parent as ViewModelStoreOwner)
              val state by vm.uiState.collectAsStateWithLifecycle()
-             Step3RegLocationScreen(
-                 state = state.step3,
-                 mode = state.step2.toScheduleMode(),
-                 onDayChange = vm::onScheduleDayChange,
-                 onNext = { if (vm.validateStep3()) navController.navigate(Step4Route) },
-                 onBack = { navController.popBackStack() }
-             )
+
+             RegisterLocationStepScaffold(
+                 currentStep = 3,
+                 previousStep = vm.stepperFrom,
+                 onStepShown = vm::onStepperShown,
+                 onStepClick = { step -> navController.popToStep(step) }
+             ){
+                 Step3RegLocationScreen(
+                     state = state.step3,
+                     mode = state.step2.toScheduleMode(),
+                     onDayChange = vm::onScheduleDayChange,
+                     onNext = { if (vm.validateStep3()) navController.navigate(Step4Route) },
+                     onBack = { navController.popBackStack() }
+                 )
+             }
+
          }
 
          composable<Step4Route> { entry ->
@@ -113,28 +140,36 @@ fun NavGraphBuilder.registerLocationGraph(navController: NavHostController)
                      }
                  }
              }
-             Box(modifier = Modifier.fillMaxSize()) {
-                 Step4RegLocationScreen(
-                     usersState = usersState,
-                     state = state.step4,
-                     saveState = saveState,
-                     onUserSelectionChange = vm::onUserSelectionChange,
-                     onRetry = { vm.loadUsers(force = true) },
-                     onSave = vm::save,
-                     onBack = { navController.popBackStack() },
-                     onRegisterNewUser = { navController.navigate("registerUser") }
-                 )
-                 AnimatedVisibility(
-                     visible = toastMessage != null,
-                     enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
-                     exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut(),
-                     modifier = Modifier.align(Alignment.TopCenter)
-                 ) {
-                     toastMessage?.let { message ->
-                         CustomTopToast(message = message, isError = isErrorToast)
+             RegisterLocationStepScaffold(
+                 currentStep = 4,
+                 previousStep = vm.stepperFrom,
+                 onStepShown = vm::onStepperShown,
+                 onStepClick = { step -> navController.popToStep(step) }
+             ){
+                 Box(modifier = Modifier.fillMaxSize()) {
+                     Step4RegLocationScreen(
+                         usersState = usersState,
+                         state = state.step4,
+                         saveState = saveState,
+                         onUserSelectionChange = vm::onUserSelectionChange,
+                         onRetry = { vm.loadUsers(force = true) },
+                         onSave = vm::save,
+                         onBack = { navController.popBackStack() },
+                         onRegisterNewUser = { navController.navigate("registerUser") }
+                     )
+                     AnimatedVisibility(
+                         visible = toastMessage != null,
+                         enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
+                         exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut(),
+                         modifier = Modifier.align(Alignment.TopCenter)
+                     ) {
+                         toastMessage?.let { message ->
+                             CustomTopToast(message = message, isError = isErrorToast)
+                         }
                      }
                  }
              }
+
 
          }
 
@@ -145,4 +180,12 @@ fun NavGraphBuilder.registerLocationGraph(navController: NavHostController)
          }
 
      }
+}
+
+fun NavController.popToStep(step: Int) {
+    when (step) {
+        1 -> popBackStack<Step1Route>(inclusive = false)
+        2 -> popBackStack<Step2Route>(inclusive = false)
+        3 -> popBackStack<Step3Route>(inclusive = false)
+    }
 }

@@ -21,6 +21,7 @@ import com.example.checkgo.feature_admin.presentation.screens.registerLocationSc
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -100,6 +101,13 @@ class RegisterLocationViewModel @Inject constructor(
     val navigationEvent = _navigationEvent.receiveAsFlow()
     private var usersJob: Job? = null
     private var geocodeJob: Job? = null
+
+    var stepperFrom: Int = 1
+        private set
+
+    fun onStepperShown(step: Int) {
+        stepperFrom = step
+    }
 
 
     init {
@@ -260,19 +268,22 @@ class RegisterLocationViewModel @Inject constructor(
         )
         _saveState.value = SaveState.Saving
         viewModelScope.launch {
-            registerArrivalLocationUseCase(requestArrivalLocation).fold(
-                onSuccess = { message ->
-                    _saveState.value = SaveState.Success
-                    _navigationEvent.send(RegisterLocationUiEvent.Navigate(RegisterLocationSuccessRoute))
-                    _saveState.value = SaveState.Idle
-                },
-                onFailure = { exception ->
-                    _saveState.value = SaveState.Idle
-                    _navigationEvent.send(
-                        RegisterLocationUiEvent.ShowToast(exception.message ?: "Error desconocido")
-                    )
-                }
-            )
+            delay(1500)
+            _saveState.value = SaveState.Idle
+            _navigationEvent.send(RegisterLocationUiEvent.Navigate(RegisterLocationSuccessRoute))
+//            registerArrivalLocationUseCase(requestArrivalLocation).fold(
+//                onSuccess = { message ->
+//                    _saveState.value = SaveState.Success
+//                    _navigationEvent.send(RegisterLocationUiEvent.Navigate(RegisterLocationSuccessRoute))
+//                    _saveState.value = SaveState.Idle
+//                },
+//                onFailure = { exception ->
+//                    _saveState.value = SaveState.Idle
+//                    _navigationEvent.send(
+//                        RegisterLocationUiEvent.ShowToast(exception.message ?: "Error desconocido")
+//                    )
+//                }
+//            )
         }
     }
 
@@ -292,4 +303,5 @@ class RegisterLocationViewModel @Inject constructor(
             _uiState.update { it.copy(step1 = it.step1.copy(address = address)) }
         }
     }
+
 }

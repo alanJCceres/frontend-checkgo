@@ -50,12 +50,13 @@ fun Step4RegLocationScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(20.dp,0.dp,20.dp,20.dp),
     ) {
         Text(
-            text = "Selecciona los usuarios",
+            text = "Asigna usuarios a la ubicación",
             style = StyleTextTituloBody
         )
+        Spacer(Modifier.height(3.dp))
         Text(
             text = "${state.usersSelected.size} seleccionados",
             style = StyleTextBodySmall,
