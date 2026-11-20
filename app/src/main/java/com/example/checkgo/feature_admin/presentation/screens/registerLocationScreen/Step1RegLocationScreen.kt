@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
@@ -170,12 +171,13 @@ fun Step1RegLocationScreen(
 
     //INTERFAZ
     Box(modifier = Modifier.fillMaxSize()){
-
+        val topInset = 150.dp
         GoogleMap(
             modifier = Modifier.matchParentSize(),
             cameraPositionState = cameraPositionState,
             properties = mapProperties,
             uiSettings = mapUiSettings,
+            contentPadding = PaddingValues(top = topInset),
             mapColorScheme = ComposeMapColorScheme.LIGHT
         )
 
@@ -186,7 +188,7 @@ fun Step1RegLocationScreen(
             modifier = Modifier
                 .align(Alignment.Center)
                 .size(48.dp)
-                .offset(y = (-24).dp)
+                .offset(y = (-24).dp + topInset / 2)
         )
         //BotomSheet
         AnimatedVisibility (

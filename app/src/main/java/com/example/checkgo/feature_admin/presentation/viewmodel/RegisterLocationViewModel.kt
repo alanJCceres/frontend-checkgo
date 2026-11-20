@@ -101,6 +101,13 @@ class RegisterLocationViewModel @Inject constructor(
     private var usersJob: Job? = null
     private var geocodeJob: Job? = null
 
+    var stepperFrom: Int = 1
+        private set
+
+    fun onStepperShown(step: Int) {
+        stepperFrom = step
+    }
+
 
     init {
         viewModelScope.launch {
@@ -292,4 +299,5 @@ class RegisterLocationViewModel @Inject constructor(
             _uiState.update { it.copy(step1 = it.step1.copy(address = address)) }
         }
     }
+
 }

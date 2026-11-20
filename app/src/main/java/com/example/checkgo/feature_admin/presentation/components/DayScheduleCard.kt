@@ -1,5 +1,6 @@
 package com.example.checkgo.feature_admin.presentation.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,6 +17,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -30,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.checkgo.feature_admin.data.dto.ArrivalLocationHourRequestDto
 import com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen.MAX_INTERVALS_PER_DAY
 import com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen.isComplete
@@ -71,6 +74,10 @@ fun DayScheduleCard(
             .fillMaxWidth(),
         colors = CardDefaults.outlinedCardColors(
             containerColor = Color.White
+        ),
+        border = BorderStroke(
+            width = 1.5.dp,
+            color = Color(0xFFE0E0E0)
         )
     ) {
         Column(
@@ -100,7 +107,13 @@ fun DayScheduleCard(
                                 else day.intervalos
                             )
                         )
-                    }
+                    },
+                    colors = SwitchDefaults.colors(
+                        // Apagado
+                        uncheckedThumbColor = Color(0xFFbebebe),
+                        uncheckedTrackColor = Color(0xFFf1f1f1),
+                        uncheckedBorderColor = Color(0xFFbebebe)
+                )
                 )
             }
 
@@ -166,7 +179,7 @@ fun DayScheduleCard(
             } else {
                 Text(
                     text = "No se tomará en cuenta",
-                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

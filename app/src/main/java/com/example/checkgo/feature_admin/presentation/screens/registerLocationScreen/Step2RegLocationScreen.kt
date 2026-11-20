@@ -107,11 +107,10 @@ fun Step2RegLocationScreen(
     }
 
 
-
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(20.dp,20.dp),
+            .padding(20.dp,0.dp,20.dp,20.dp),
     ) {
         // INTERFAZ
         Column(
@@ -124,23 +123,31 @@ fun Step2RegLocationScreen(
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ){
+                Column() {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ){
+                        Text(
+                            text = "Radio de la ubicación",
+                            style = StyleTextTituloBody
+                        )
+                        CustomBadge(
+                            text = "$radio m",
+                            colors = BadgeDefaults.Blue,
+                            fontSize = 14,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
                     Text(
-                        text = "Radio de la ubicación",
-                        style = StyleTextTituloBody
-                    )
-                    CustomBadge(
-                        text = "$radio m",
-                        colors = BadgeDefaults.Blue,
-                        fontSize = 14,
-                        fontWeight = FontWeight.SemiBold
+                        text = "Define el área circular donde los usuarios podrán marcar su asistencia.",
+                        style = StyleTextBodySmall,
+                        color = Color.Gray
                     )
                 }
+
                 GoogleMap(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -170,7 +177,6 @@ fun Step2RegLocationScreen(
                             inactiveTrackColor = Color.LightGray,
                         )
                     )
-
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
@@ -178,12 +184,6 @@ fun Step2RegLocationScreen(
                         Text("$MinRadius m", style = MaterialTheme.typography.labelSmall)
                         Text("$MaxRadius m", style = MaterialTheme.typography.labelSmall)
                     }
-                    Spacer(Modifier.height(12.dp))
-                    Text(
-                        text = "Define el área circular donde los usuarios podrán marcar su asistencia.",
-                        style = StyleTextBodySmall,
-                        color = Color.Gray
-                    )
                 }
             }
 

@@ -41,7 +41,7 @@ val CheckGoTypography = Typography(
 )
 val StyleTextTituloHeader = TextStyle( //estilo para titulo de screen
     fontWeight = FontWeight.Bold,
-    fontSize = 32.sp,
+    fontSize = 24.sp,
 )
 val StyleTextSubHeader = TextStyle( //estilo para sub header
     fontWeight = FontWeight.Medium,
