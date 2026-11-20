@@ -15,7 +15,9 @@ object NewLocationNameValidator {
     fun validate(locationName: String): String? {
         return when {
             locationName.length < 3 -> "El nombre debe tener al menos 3 caracteres."
-            locationName.length > 100 -> "El nombre no debe tener más de 20 carácteres."
+            locationName.length > 100 -> "El nombre no debe tener más de 100 carácteres."
+            !locationName.matches(Regex("^[\\p{L}\\p{N} _,.]+$")) ->
+                "El nombre no puede tener carácteres especiales."
             else -> null
         }
     }
