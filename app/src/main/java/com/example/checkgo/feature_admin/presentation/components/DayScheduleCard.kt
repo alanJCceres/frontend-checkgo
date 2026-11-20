@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.checkgo.feature_admin.data.dto.ArrivalLocationHourRequestDto
 import com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen.MAX_INTERVALS_PER_DAY
 import com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen.isComplete
@@ -178,7 +179,7 @@ fun DayScheduleCard(
             } else {
                 Text(
                     text = "No se tomará en cuenta",
-                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

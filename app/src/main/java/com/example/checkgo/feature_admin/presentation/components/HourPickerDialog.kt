@@ -13,9 +13,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
+import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -41,11 +43,33 @@ fun HourPickerDialog(
     ) {
         Surface(
             shape = MaterialTheme.shapes.extraLarge,
-            tonalElevation = 6.dp,
+            color = Color.White,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            tonalElevation = 0.dp,
+            shadowElevation = 8.dp,
             modifier = Modifier.width(IntrinsicSize.Min)
+            //tonalElevation = 6.dp,
+            //modifier = Modifier.width(IntrinsicSize.Min)
         ) {
             Column(modifier = Modifier.padding(24.dp)) {
-                TimePicker(state = pickerState)
+                TimePicker(
+                    state = pickerState,
+                    colors = TimePickerDefaults.colors(
+                        clockDialColor = Color(0xFFf1f1f1), //
+                        selectorColor = MaterialTheme.colorScheme.primary,
+                        containerColor = Color.White,
+                        clockDialSelectedContentColor = Color.White,
+                        clockDialUnselectedContentColor = Color(0xFF333333),
+                        periodSelectorSelectedContainerColor = MaterialTheme.colorScheme.primary,
+                        periodSelectorUnselectedContainerColor = Color(0xFFF1F3F5),
+                        periodSelectorSelectedContentColor = Color.White,
+                        periodSelectorUnselectedContentColor = Color(0xFF555555),
+                        timeSelectorSelectedContainerColor = Color(0xFFf1f1f1), //
+                        timeSelectorUnselectedContainerColor = Color(0xFFF1F3F5),
+                        timeSelectorSelectedContentColor = MaterialTheme.colorScheme.primary,
+                        timeSelectorUnselectedContentColor = Color(0xFF333333)
+                    )
+                )
                 Row (
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End

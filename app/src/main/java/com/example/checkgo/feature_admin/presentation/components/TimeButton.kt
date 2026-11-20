@@ -13,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccessTime
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -22,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.checkgo.core.ui.theme.LightColorPrimary50
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -53,7 +53,7 @@ import java.util.Locale
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f))
+            .background(LightColorPrimary50)
             .clickable(onClick = onClick)
             .padding(horizontal = 14.dp, vertical = 13.dp),
         contentAlignment = Alignment.CenterStart
@@ -82,12 +82,4 @@ import java.util.Locale
             )
         }
     }
-//    OutlinedButton(onClick = onClick, modifier = modifier) {
-//        Text(
-//            text = value.ifBlank { label },
-//            maxLines = 1,
-//            color = if (value.isBlank()) MaterialTheme.colorScheme.onSurfaceVariant
-//            else MaterialTheme.colorScheme.onSurface
-//        )
-//    }
 }

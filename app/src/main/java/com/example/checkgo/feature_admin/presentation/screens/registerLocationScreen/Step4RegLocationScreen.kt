@@ -27,6 +27,7 @@ import com.example.checkgo.feature_admin.presentation.viewmodel.Step4State
 import com.example.checkgo.feature_admin.presentation.viewmodel.Step4UsersUiState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
 import com.example.checkgo.core.ui.components.EmptyStateView
 import com.example.checkgo.core.ui.theme.StyleTextBodySmall
 import com.example.checkgo.core.ui.theme.StyleTextTituloBody
@@ -105,8 +106,10 @@ fun Step4RegLocationScreen(
         }
 
         state.usersError?.let {
-            Spacer(Modifier.height(8.dp))
-            Text(it, color = Color.Red, style = MaterialTheme.typography.bodySmall)
+            Spacer(Modifier.height(14.dp))
+            Text(text = it,
+                color = Color.Red,
+                fontSize = 14.sp,)
         }
         (saveState as? SaveState.Error)?.let {
             Spacer(Modifier.height(8.dp))
