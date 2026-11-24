@@ -2,8 +2,12 @@ package com.example.checkgo.core.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTimeFilled
+import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.Cases
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 
 data class NavItems(
@@ -33,8 +37,13 @@ val userNavItems = listOf(
         route = "homeUser"
     ),
     NavItems(
-        title = "Reportes",
-        icon = Icons.Default.Person,
+        title = "Registros",
+        icon = Icons.Default.Book,
         route = "reportsUser"
+    ),
+    NavItems(
+        title = "Ajustes",
+        icon = Icons.Default.Settings,
+        route = "settingsUser"
     )
 )

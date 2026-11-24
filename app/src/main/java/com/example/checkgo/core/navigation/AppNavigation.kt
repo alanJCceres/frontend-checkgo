@@ -34,6 +34,7 @@ import com.example.checkgo.feature_admin.presentation.screens.EditUserScreen
 import com.example.checkgo.feature_admin.presentation.screens.registerLocationScreen.registerLocationGraph
 import com.example.checkgo.feature_admin.presentation.screens.UsersScreen
 import com.example.checkgo.feature_user.presentation.screens.ReportsUserScreen
+import com.example.checkgo.feature_user.presentation.screens.SettingsUserScreen
 
 @Composable
 fun AppNavigation(
@@ -126,6 +127,7 @@ fun AppNavigation(
                 // --- Pantallas USER ---
                 composable("homeUser"){ HomeUserScreen(navController=navController) }
                 composable("reportsUser"){ ReportsUserScreen() }
+                composable("settingsUser"){ SettingsUserScreen() }
 
             }
         }

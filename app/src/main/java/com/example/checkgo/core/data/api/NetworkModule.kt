@@ -33,7 +33,7 @@ object NetworkModule {
             expectSuccess = false
 
             defaultRequest {
-                url("http://192.168.0.5:8080/")
+                url("http://192.168.0.6:8080/")
                 contentType(ContentType.Application.Json)
             }
 
